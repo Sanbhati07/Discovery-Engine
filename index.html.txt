@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Photo Retrieval Discovery Engine — Findings</title>
+<style>
+  :root {
+    --bg: #faf9f7; --surface: #ffffff; --ink: #1c1b1a; --ink-soft: #5b5750;
+    --line: #e6e2db; --accent: #b5533c; --accent-soft: #f3e3dd;
+    --stage2: #9a7b2f; --stage3: #3c7a5e; --stage4: #3c5f9a; --stage5: #6a4c9a; --stage-other: #8a8a8a;
+  }
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--ink); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif; margin: 0; }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 32px 20px 70px; }
+  h1 { font-size: 1.6rem; margin: 0 0 8px; }
+  .sub { color: var(--ink-soft); font-size: 0.95rem; line-height: 1.55; max-width: 65ch; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 20px 22px; margin: 18px 0; }
+  .card h2 { font-size: 1.05rem; margin: 0 0 10px; }
+  .badge { display: inline-block; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; background: var(--accent-soft); color: var(--ink-soft); padding: 3px 10px; border-radius: 999px; margin-bottom: 8px; }
+  .stat-row { display: flex; gap: 16px; flex-wrap: wrap; margin: 14px 0; }
+  .stat { flex: 1; min-width: 140px; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+  .stat .num { font-size: 1.5rem; font-weight: 700; }
+  .stat .label { font-size: 0.78rem; color: var(--ink-soft); }
+  .theme { border-left: 5px solid var(--ink-soft); border-radius: 10px; border-top: 1px solid var(--line); border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 14px 16px; margin-bottom: 14px; background: var(--surface); }
+  .theme h3 { margin: 4px 0 6px; font-size: 1rem; }
+  .theme .count { font-size: 0.78rem; color: var(--ink-soft); margin-bottom: 8px; }
+  ul.evidence { margin: 8px 0 0; padding-left: 18px; font-size: 0.88rem; line-height: 1.6; }
+  .legend-item { margin-bottom: 12px; font-size: 0.9rem; line-height: 1.5; }
+  .legend-item .q { color: var(--ink-soft); font-size: 0.78rem; }
+  .footer-note { font-size: 0.8rem; color: var(--ink-soft); line-height: 1.6; border-top: 1px solid var(--line); padding-top: 16px; margin-top: 30px; }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Photo Retrieval Discovery Engine — Findings from 250 Real Reviews</h1>
+  <p class="sub">
+    This page shows the actual output of the discovery engine after analyzing 250 real, recent Google Photos
+    Play Store reviews. It's a static snapshot so it works for anyone, anywhere, with no sign-in required.
+    For the live interactive version (paste your own reviews and get a fresh AI analysis), see the
+    <a href="https://claude.ai/artifact/Nd764ScX8F5d6MthGM21cF" target="_blank">interactive tool</a> (needs a free Claude account).
+  </p>
+
+  <div class="card">
+    <h2>Data quality — an honest note</h2>
+    <div class="stat-row">
+      <div class="stat"><div class="num">250</div><div class="label">reviews collected</div></div>
+      <div class="stat"><div class="num">28</div><div class="label">genuinely about retrieval (~11%)</div></div>
+      <div class="stat"><div class="num">0</div><div class="label">fabricated — all real, sourced</div></div>
+    </div>
+    <p class="sub" style="font-size:0.85rem;">
+      The keyword filter used to collect these reviews was intentionally broad (matched words like "update",
+      "album", "memory"), which pulled in a lot of reviews that turn out to be unrelated — app crashes,
+      subscription complaints, accidental photo deletion, layout changes. Only the 28 reviews below are actually
+      about failing to find a remembered photo. The themes and counts on this page are based on those 28, not
+      all 250. This is a known limitation of keyword-based filtering; a next iteration would use an AI relevance
+      check before clustering, not just keyword matching.
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>What the 28 relevant reviews show</h2>
+
+    <div class="theme" style="border-left-color: var(--stage-other);">
+      <span class="badge">Stage 1 · Expressing</span>
+      <h3>No examples found in this dataset</h3>
+      <div class="count">0 of 28</div>
+      <p class="sub" style="font-size:0.85rem; margin:0;">
+        A real finding, not an oversight: app reviews are written after someone has already tried and failed to
+        search, so they don't capture the earlier moment of struggling to put a fuzzy memory into words. That
+        moment can only really be captured through direct user interviews — which is exactly what Part 3 of this
+        project is for.
+      </p>
+    </div>
+
+    <div class="theme" style="border-left-color: var(--stage2);">
+      <span class="badge">Stage 2 · Understanding</span>
+      <h3>Search fails to use the clue the person actually gave it</h3>
+      <div class="count">7 of 28</div>
+      <ul class="evidence">
+        <li>Searched a work address to find related photos; got no results at all.</li>
+        <li>Searched "car engine" among 100+ repair photos; only 15 came up, AI often replied "none."</li>
+        <li>Wanted to label and search for a specific person's face; the option doesn't work.</li>
+        <li>A redesign removed the ability to browse by face-group from the search screen.</li>
+      </ul>
+    </div>
+
+    <div class="theme" style="border-left-color: var(--stage3);">
+      <span class="badge">Stage 3 · Judging</span>
+      <h3>Results don't carry the context needed to tell photos apart</h3>
+      <div class="count">3 of 28</div>
+      <ul class="evidence">
+        <li>Wants photos grouped by date/event rather than topic, to distinguish similar occasions.</li>
+        <li>Lost the ability to select all photos from one specific date or month in a single tap.</li>
+      </ul>
+    </div>
+
+    <div class="theme" style="border-left-color: var(--stage4);">
+      <span class="badge">Stage 4 · Recovering</span>
+      <h3>No good way to narrow down or regain a working search</h3>
+      <div class="count">6 of 28</div>
+      <ul class="evidence">
+        <li>Wants a way to hide unrelated local photos so only backed-up ones show while searching.</li>
+        <li>New finding: search now requires turning on cloud Backup first — locked behind an unrelated setting.</li>
+        <li>Says visually scanning for a photo now "gives a migraine" since search is unreliable.</li>
+      </ul>
+    </div>
+
+    <div class="theme" style="border-left-color: var(--stage5);">
+      <span class="badge">Stage 5 · Trusting — the largest, most consistent pattern</span>
+      <h3>People believe the AI search is worse on purpose, and stop relying on it</h3>
+      <div class="count">8 of 28</div>
+      <ul class="evidence">
+        <li>Believes classic keyword search was deliberately weakened to push people toward the AI assistant.</li>
+        <li>Calls the AI photo assistant "useless" and "worthless" for search.</li>
+        <li>Reports deceptive AI pop-ups appearing right where the search icon used to be.</li>
+        <li>Multiple long-time users say search quality has declined since AI features were added.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>What do "Stage 1–5" mean?</h2>
+    <div class="legend-item"><strong>Stage 1 · Expressing —</strong> the person can't put a fuzzy memory into words specific enough to search with.<div class="q">From: "Is the user unable to express what they remember?"</div></div>
+    <div class="legend-item"><strong>Stage 2 · Understanding —</strong> a real clue was given, but the search failed to read or use it correctly.<div class="q">From: "Does Google Photos fail to understand the clues they provide?"</div></div>
+    <div class="legend-item"><strong>Stage 3 · Judging —</strong> results came back, but the person can't tell which one is right.<div class="q">From: "Are potentially relevant results difficult to evaluate?"</div></div>
+    <div class="legend-item"><strong>Stage 4 · Recovering —</strong> the first search failed, with no easy way to refine or retry.<div class="q">From: "Does the user struggle to refine an unsuccessful search?"</div></div>
+    <div class="legend-item"><strong>Stage 5 · Trusting —</strong> an AI search feature exists, but people distrust it and revert to old habits.<div class="q">Added from evidence — not one of the original questions, but the strongest pattern found.</div></div>
+  </div>
+
+  <div class="footer-note">
+    Source data: 250 Play Store reviews for Google Photos, collected via a script using the <code>google-play-scraper</code>
+    library, filtered to English-language reviews mentioning search/retrieval-adjacent keywords, then manually
+    reviewed for actual relevance. Full source code and the collection script are in this repository.
+  </div>
+
+</div>
+</body>
+</html>
