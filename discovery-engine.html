@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Photo Retrieval — Discovery Engine</title>
+<style>
+  :root {
+    --bg: #faf9f7;
+    --surface: #ffffff;
+    --ink: #1c1b1a;
+    --ink-soft: #5b5750;
+    --line: #e6e2db;
+    --accent: #b5533c;
+    --accent-soft: #f3e3dd;
+    --stage1: #b5533c;
+    --stage2: #9a7b2f;
+    --stage3: #3c7a5e;
+    --stage4: #3c5f9a;
+    --stage5: #6a4c9a;
+    --stage6: #8a8a8a;
+    font-size: 16px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #171512;
+      --surface: #221f1c;
+      --ink: #f2efe9;
+      --ink-soft: #b9b2a6;
+      --line: #3a352e;
+      --accent-soft: #3a2a24;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #171512;
+    --surface: #221f1c;
+    --ink: #f2efe9;
+    --ink-soft: #b9b2a6;
+    --line: #3a352e;
+    --accent-soft: #3a2a24;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif;
+    margin: 0;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .wrap {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 28px 20px 60px;
+  }
+  header { margin-bottom: 22px; }
+  h1 {
+    font-size: 1.5rem;
+    margin: 0 0 6px;
+    letter-spacing: -0.01em;
+  }
+  .sub {
+    color: var(--ink-soft);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    max-width: 60ch;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 18px 20px;
+    margin-bottom: 18px;
+  }
+  label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--ink-soft);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  textarea {
+    width: 100%;
+    min-height: 220px;
+    resize: vertical;
+    background: var(--bg);
+    color: var(--ink);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 0.92rem;
+    line-height: 1.5;
+    font-family: inherit;
+  }
+  .hint {
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+    margin-top: 8px;
+    line-height: 1.5;
+  }
+  .row {
+    display: flex;
+    gap: 10px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  button {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 11px 18px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  button.secondary {
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--line);
+  }
+  button:disabled { opacity: 0.55; cursor: default; }
+  .status {
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+  }
+  .themes {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .theme {
+    border: 1px solid var(--line);
+    border-left-width: 5px;
+    border-radius: 10px;
+    padding: 14px 16px;
+    background: var(--surface);
+  }
+  .theme-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .theme-name {
+    font-weight: 700;
+    font-size: 1rem;
+  }
+  .theme-stage {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--ink-soft);
+    background: var(--accent-soft);
+    padding: 3px 9px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+  .theme-count {
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+  }
+  .theme-desc {
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+    margin: 8px 0 10px;
+    line-height: 1.5;
+  }
+  .evidence {
+    font-size: 0.85rem;
+    border-top: 1px dashed var(--line);
+    padding-top: 8px;
+  }
+  .evidence-item {
+    margin-bottom: 6px;
+    line-height: 1.45;
+  }
+  .evidence-item .src {
+    color: var(--ink-soft);
+    font-size: 0.78rem;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    margin-top: 6px;
+  }
+  th, td {
+    text-align: left;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+  }
+  th { color: var(--ink-soft); font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.03em; }
+  .scroll-x { overflow-x: auto; }
+  .footer-note {
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+    margin-top: 26px;
+    line-height: 1.6;
+    border-top: 1px solid var(--line);
+    padding-top: 14px;
+  }
+  .error {
+    color: #b5533c;
+    font-size: 0.85rem;
+    margin-top: 8px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Discovery Engine — Photo Retrieval Failures</h1>
+    <div class="sub">
+      Paste real user comments below (App Store / Play Store reviews, Reddit posts, forum threads, support pages —
+      anything where someone talks about failing to find an old photo). The tool sorts each comment into a stage
+      of the "vague memory retrieval" journey, so patterns across many messy comments become visible.
+    </div>
+  </header>
+
+  <div class="card">
+    <label for="input">Raw feedback (one item per line)</label>
+    <textarea id="input"></textarea>
+    <div class="hint">
+      Already pre-filled with a starting set of real, publicly reported user comments (paraphrased, sources noted)
+      so you can see how it works right away. Delete these and paste your own set any time — works fine with a
+      handful of lines or several hundred (it processes large sets in batches of 25 automatically, then merges
+      matching themes together).
+    </div>
+    <div class="row">
+      <button id="runBtn">Run live analysis</button>
+      <button id="cachedBtn" class="secondary" type="button">Show example output (no AI call)</button>
+      <button id="resetBtn" class="secondary" type="button">Reset to sample set</button>
+      <span class="status" id="status"></span>
+    </div>
+    <div class="hint" style="margin-top:10px;">
+      "Show example output" instantly displays a real result from an earlier run of this exact tool, with no live
+      AI call — useful if the live analysis is ever rate-limited or unavailable when someone is testing this.
+    </div>
+    <div class="error" id="error" style="display:none;"></div>
+  </div>
+
+  <div class="card">
+    <label>Review database (saved permanently — survives closing this page)</label>
+    <div class="sub" style="font-size:0.85rem; margin-bottom:12px;">
+      Save whatever is in the box above so it's not lost, and build up your collection over multiple sittings.
+      <span id="dbCount"></span>
+    </div>
+    <div class="row">
+      <button id="saveDbBtn" class="secondary" type="button" style="display:none;">Save current lines to database</button>
+      <button id="loadDbBtn" class="secondary" type="button">Load all saved reviews into the box</button>
+      <button id="clearDbBtn" class="secondary" type="button" style="display:none;">Clear database</button>
+    </div>
+    <div class="status" id="dbStatus" style="margin-top:8px;"></div>
+    <div class="hint" id="dbOwnerNote" style="margin-top:8px;">Anyone viewing this page can load the saved set and run analysis on it. Adding to or clearing the saved set is limited to the creator.</div>
+  </div>
+
+  <div id="results"></div>
+
+  <div class="footer-note">
+    How this works: each comment is sent to Claude with instructions to classify it against a fixed retrieval-journey
+    model (expressing the memory → the search understanding the clue → judging the results → recovering from a
+    failed search → trusting/using the AI search feature at all), and to tag what kind of photo is being described
+    and which specific details the person did or didn't remember. Similar comments are grouped into named themes
+    with the original evidence attached. Nothing is invented — if a comment doesn't fit the topic, it's marked
+    "not relevant" and left out of the themes below.
+  </div>
+
+  <div class="card" style="margin-top:18px;">
+    <label>What do "Stage 1–5" mean?</label>
+    <div class="sub" style="font-size:0.85rem; margin-bottom:14px;">
+      Every comment gets sorted into one of these 5 points in a person's retrieval journey — where exactly things
+      went wrong for them. Stages 1–4 come directly from the questions this project set out to answer; Stage 5 was
+      added after the evidence below pointed to it clearly.
+    </div>
+    <div style="display:flex; flex-direction:column; gap:12px;">
+      <div>
+        <strong>Stage 1 · Expressing —</strong> the person remembers that a photo exists, but can't put the fuzzy
+        memory into words specific enough to search with at all.
+        <div class="src">Answers: "Is the user unable to express what they remember?"</div>
+      </div>
+      <div>
+        <strong>Stage 2 · Understanding —</strong> the person DID give a real clue — a place, an object, a date, a
+        word written in the photo — but the search failed to read or use that clue correctly.
+        <div class="src">Answers: "Does Google Photos fail to understand the clues they provide?"</div>
+      </div>
+      <div>
+        <strong>Stage 3 · Judging —</strong> the search did return results, but the person can't tell which one (if
+        any) is the right photo, often because dates or context are missing.
+        <div class="src">Answers: "Are potentially relevant results difficult to evaluate?"</div>
+      </div>
+      <div>
+        <strong>Stage 4 · Recovering —</strong> the first search failed, and there was no easy way to adjust or
+        narrow it — the person had to start over or scroll manually instead.
+        <div class="src">Answers: "Does the user struggle to refine an unsuccessful search?"</div>
+      </div>
+      <div>
+        <strong>Stage 5 · Trusting —</strong> an AI-powered search feature exists and could technically help, but
+        the person avoids it, doesn't trust its answers, or reverts to their old keyword-search habit instead of
+        using it.
+        <div class="src">Added based on evidence found — not one of the original questions, but a pattern real users kept describing.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SAMPLE = [
+"Play Store review (Mar 2025): search used to return exact keyword matches with dates; after an update it feels completely unusable and even old photos seem to have vanished.",
+"Play Store review (Feb 2025): after a menu redesign, shared albums and conversations got buried five settings-menus deep; user says they can no longer find things that used to take one tap.",
+"Reddit, r/GooglePixel (via Android Police, 2026): user says they used to type a word or phrase and jump straight to photos containing that text; now they have to ask Gemini instead, and it just doesn't work.",
+"Reddit, r/GooglePhotos (via Android Police, 2026): a longtime user says they're disappointed, calling Google Photos previously 'the undisputed king' of photo storage and organization before the AI changes.",
+"Google Photos Product Manager Jamie Aspinall, posting on X (2025): acknowledged that the new AI search 'isn't where it needs to be' on speed, result quality, and overall experience.",
+"TechCrunch (Mar 2026): Google added a visible toggle to switch back to 'classic' search after users kept complaining the new AI search still missed photos and felt less accurate than before.",
+"PhoneArena (2026): commenters on a Reddit thread titled 'Did Gemini ruin search in Photos?' say they can't even find something as simple as a photo of a monkey at the zoo anymore.",
+"Frequent-flyer forum post (2024): user remembers taking a photo in a specific square in London but not the year; doesn't want to type 'London' because it would return thousands of unrelated results, and wishes they could search by roughly where the photo was taken instead.",
+"Google Photos community thread (undated): user says the app's search doesn't understand two combined ideas at once — searching 'cats and dogs' only returns one animal, not both — so they have to run separate searches and manually cross-check.",
+"Play Store review (2025): says they miss being able to see all photos matching a search sorted with dates attached, because now they can't tell which result is from which trip."
+];
+
+function loadSample() {
+  document.getElementById('input').value = SAMPLE.join('\n');
+}
+loadSample();
+document.getElementById('resetBtn').addEventListener('click', loadSample);
+
+const STAGE_LABELS = {
+  "expressing": "Stage 1 · Putting the memory into words",
+  "understanding": "Stage 2 · Search understanding the clue",
+  "judging": "Stage 3 · Judging the results shown",
+  "recovering": "Stage 4 · Recovering from a failed search",
+  "trusting": "Stage 5 · Trusting / bothering to use the AI search",
+  "other": "Not directly relevant"
+};
+const STAGE_COLOR = {
+  "expressing": "var(--stage1)",
+  "understanding": "var(--stage2)",
+  "judging": "var(--stage3)",
+  "recovering": "var(--stage4)",
+  "trusting": "var(--stage5)",
+  "other": "var(--stage6)"
+};
+
+const BATCH_SIZE = 25;
+
+function buildPrompt(batch, globalOffset) {
+  return [
+    "You are helping analyze real user complaints about failing to find an old photo they remember in Google Photos.",
+    "",
+    "Here is a fixed 'retrieval journey' model with 5 stages plus an 'other' bucket:",
+    "1. expressing — the user struggles to put their fuzzy memory into a searchable description at all (they know something exists but can't phrase it)",
+    "2. understanding — the user DID give a clue (a place, a time, an object, a combination of things, partial text) but the search failed to interpret or use that clue correctly",
+    "3. judging — the search returned results, but the user can't easily tell which one (if any) is the right photo, or results are missing context needed to judge them (date, trip, sorting)",
+    "4. recovering — the user's first search failed and there was no good way to refine, narrow, or try again without starting over or manually scrolling",
+    "5. trusting — the user is aware of an AI/conversational search feature but avoids it, distrusts it, reverts to old habits, or is frustrated by it being harder to invoke than the old method (this is an adoption/trust failure, not a capability failure)",
+    "6. other — genuinely unrelated to vague-memory photo retrieval (e.g. a pure bug report about storage, or a UI complaint unrelated to search)",
+    "",
+    "Given this numbered list of real user comments, group them into thematic clusters. Multiple comments can belong to the same theme even if they used different words. A comment can only belong to ONE theme. Use a SHORT, CONSISTENT, generic theme name (e.g. 'Search misses combined clues', 'Users distrust AI search and revert to keywords') so similar comments from other batches would match the same name.",
+    "",
+    "Return ONLY valid JSON, no markdown fences, no commentary, matching exactly this shape:",
+    '{"themes":[{"name":"short punchy theme name (max 8 words)","stage":"one of expressing|understanding|judging|recovering|trusting|other","description":"1-2 plain-English sentences on the pattern, written for a non-technical reader","evidence":[{"summary":"short paraphrase of what this specific comment shows, in plain words, under 20 words","source_index":0,"photo_type":"one of person|place|event|document_or_screenshot|food|object|unspecified","remembered_clue":"short phrase: the specific detail the person said they DID remember (empty string if not mentioned)","forgotten_detail":"short phrase: the specific detail the person said they could NOT remember (empty string if not mentioned)"}]}]}',
+    "",
+    "Rules: do not invent comments that aren't in the list. Every input comment must appear in exactly one theme's evidence (use its 0-based GLOBAL index shown before each comment as source_index), including a single 'other' theme for anything irrelevant. Only fill remembered_clue / forgotten_detail when the comment actually says so — leave as empty string otherwise, don't guess. Keep descriptions in very plain, simple English — avoid jargon.",
+    "",
+    "Comments:",
+    batch.map((r, i) => (globalOffset + i) + ". " + r).join('\n')
+  ].join('\n');
+}
+
+function mergeThemeBatches(allBatchThemes) {
+  const merged = new Map(); // key: normalized name -> theme object
+  allBatchThemes.forEach(theme => {
+    const key = (theme.name || 'untitled').trim().toLowerCase();
+    if (!merged.has(key)) {
+      merged.set(key, {
+        name: theme.name,
+        stage: theme.stage,
+        description: theme.description,
+        evidence: []
+      });
+    }
+    const m = merged.get(key);
+    (theme.evidence || []).forEach(ev => m.evidence.push(ev));
+  });
+  return Array.from(merged.values()).sort((a, b) => b.evidence.length - a.evidence.length);
+}
+
+async function run() {
+  const runBtn = document.getElementById('runBtn');
+  const statusEl = document.getElementById('status');
+  const errorEl = document.getElementById('error');
+  const resultsEl = document.getElementById('results');
+  errorEl.style.display = 'none';
+  resultsEl.innerHTML = '';
+
+  const raw = document.getElementById('input').value
+    .split('\n')
+    .map(s => s.trim())
+    .filter(Boolean);
+
+  if (raw.length === 0) {
+    errorEl.textContent = 'Paste at least one comment first.';
+    errorEl.style.display = 'block';
+    return;
+  }
+
+  const sample = await claude.use('sample');
+  if (!sample) {
+    errorEl.textContent = 'AI analysis isn\u2019t available in this view. Try opening the artifact directly rather than a shared/read-only preview.';
+    errorEl.style.display = 'block';
+    return;
+  }
+
+  runBtn.disabled = true;
+
+  const batches = [];
+  for (let i = 0; i < raw.length; i += BATCH_SIZE) {
+    batches.push(raw.slice(i, i + BATCH_SIZE));
+  }
+
+  const allBatchThemes = [];
+  try {
+    for (let b = 0; b < batches.length; b++) {
+      statusEl.textContent = 'Analyzing batch ' + (b + 1) + ' of ' + batches.length +
+        ' (' + raw.length + ' comments total)\u2026';
+      const offset = b * BATCH_SIZE;
+      const prompt = buildPrompt(batches[b], offset);
+      const result = await sample.json(prompt, { modelTier: 'complex' });
+      if (result && Array.isArray(result.themes)) {
+        allBatchThemes.push(...result.themes);
+      }
+    }
+    const merged = mergeThemeBatches(allBatchThemes);
+    renderThemes({ themes: merged }, raw);
+    statusEl.textContent = 'Done — analyzed ' + raw.length + ' comment(s) across ' + batches.length +
+      ' batch(es), found ' + merged.length + ' theme(s).' +
+      (batches.length > 1 ? ' Themes with slightly different wording across batches may still overlap — skim for near-duplicates.' : '');
+  } catch (err) {
+    errorEl.textContent = 'Analysis failed: ' + (err && err.message ? err.message : 'please try again.');
+    errorEl.style.display = 'block';
+    statusEl.textContent = '';
+  } finally {
+    runBtn.disabled = false;
+  }
+}
+
+function renderThemes(result, raw) {
+  const resultsEl = document.getElementById('results');
+  if (!result || !Array.isArray(result.themes)) {
+    resultsEl.innerHTML = '<div class="card">No structured result came back — try running again.</div>';
+    return;
+  }
+
+  const card = document.createElement('div');
+  card.className = 'card';
+
+  const heading = document.createElement('div');
+  heading.style.marginBottom = '14px';
+  heading.innerHTML = '<label style="margin-bottom:2px;">Themes found</label>' +
+    '<div class="sub" style="font-size:0.85rem;">Grouped from the ' + raw.length + ' comment(s) you provided.</div>';
+  card.appendChild(heading);
+
+  const themesWrap = document.createElement('div');
+  themesWrap.className = 'themes';
+
+  result.themes.forEach(theme => {
+    const stageKey = STAGE_LABELS[theme.stage] ? theme.stage : 'other';
+    const el = document.createElement('div');
+    el.className = 'theme';
+    el.style.borderLeftColor = STAGE_COLOR[stageKey];
+
+    const evCount = Array.isArray(theme.evidence) ? theme.evidence.length : 0;
+    el.innerHTML =
+      '<div class="theme-head">' +
+        '<span class="theme-name">' + escapeHtml(theme.name || 'Untitled theme') + '</span>' +
+        '<span class="theme-stage">' + escapeHtml(STAGE_LABELS[stageKey]) + '</span>' +
+      '</div>' +
+      '<div class="theme-count">' + evCount + ' comment(s) in this theme</div>' +
+      '<div class="theme-desc">' + escapeHtml(theme.description || '') + '</div>';
+
+    const evWrap = document.createElement('div');
+    evWrap.className = 'evidence';
+    (theme.evidence || []).forEach(ev => {
+      const item = document.createElement('div');
+      item.className = 'evidence-item';
+      const original = (typeof ev.source_index === 'number' && raw[ev.source_index]) ? raw[ev.source_index] : '';
+      const tags = [];
+      if (ev.photo_type && ev.photo_type !== 'unspecified') tags.push('photo: ' + ev.photo_type.replace(/_/g, ' '));
+      if (ev.remembered_clue) tags.push('remembered: ' + ev.remembered_clue);
+      if (ev.forgotten_detail) tags.push('forgot: ' + ev.forgotten_detail);
+      item.innerHTML = '\u2022 ' + escapeHtml(ev.summary || '') +
+        (tags.length ? '<div class="src">' + escapeHtml(tags.join(' \u00b7 ')) + '</div>' : '') +
+        (original ? '<div class="src">Source: ' + escapeHtml(truncate(original, 140)) + '</div>' : '');
+      evWrap.appendChild(item);
+    });
+    el.appendChild(evWrap);
+    themesWrap.appendChild(el);
+  });
+
+  card.appendChild(themesWrap);
+  resultsEl.appendChild(card);
+
+  // Signals overview: what kind of photos, what's remembered vs forgotten
+  const allEvidence = [];
+  result.themes.forEach(t => (t.evidence || []).forEach(ev => allEvidence.push(ev)));
+  const typeCounts = {};
+  const remembered = [];
+  const forgotten = [];
+  allEvidence.forEach(ev => {
+    const pt = ev.photo_type && ev.photo_type !== 'unspecified' ? ev.photo_type.replace(/_/g, ' ') : null;
+    if (pt) typeCounts[pt] = (typeCounts[pt] || 0) + 1;
+    if (ev.remembered_clue) remembered.push(ev.remembered_clue);
+    if (ev.forgotten_detail) forgotten.push(ev.forgotten_detail);
+  });
+  const typeRows = Object.entries(typeCounts).sort((a, b) => b[1] - a[1])
+    .map(([k, v]) => '<tr><td>' + escapeHtml(k) + '</td><td>' + v + '</td></tr>').join('');
+  const signalsCard = document.createElement('div');
+  signalsCard.className = 'card';
+  signalsCard.innerHTML =
+    '<label>Signals — what kind of photos, what people remember vs forget</label>' +
+    '<div class="sub" style="font-size:0.85rem; margin-bottom:10px;">Only counts what was explicitly said in the comments — nothing guessed.</div>' +
+    (typeRows ? '<table><thead><tr><th>Photo type mentioned</th><th>Count</th></tr></thead><tbody>' + typeRows + '</tbody></table>' : '<div class="sub">No photo type mentioned explicitly in this set.</div>') +
+    '<div style="display:flex; gap:20px; margin-top:14px; flex-wrap:wrap;">' +
+      '<div style="flex:1; min-width:220px;"><div class="theme-count" style="margin-bottom:6px;">What people said they DID remember</div>' +
+        (remembered.length ? '<ul style="margin:0; padding-left:18px; font-size:0.85rem; line-height:1.6;">' + remembered.slice(0, 10).map(r => '<li>' + escapeHtml(r) + '</li>').join('') + '</ul>' : '<div class="sub" style="font-size:0.85rem;">None explicitly mentioned.</div>') +
+      '</div>' +
+      '<div style="flex:1; min-width:220px;"><div class="theme-count" style="margin-bottom:6px;">What people said they COULDN\u2019T remember</div>' +
+        (forgotten.length ? '<ul style="margin:0; padding-left:18px; font-size:0.85rem; line-height:1.6;">' + forgotten.slice(0, 10).map(r => '<li>' + escapeHtml(r) + '</li>').join('') + '</ul>' : '<div class="sub" style="font-size:0.85rem;">None explicitly mentioned.</div>') +
+      '</div>' +
+    '</div>';
+  resultsEl.appendChild(signalsCard);
+
+  // Comparison table across themes
+  const compareCard = document.createElement('div');
+  compareCard.className = 'card scroll-x';
+  const rows = result.themes.map(t => {
+    const stageKey = STAGE_LABELS[t.stage] ? t.stage : 'other';
+    const count = Array.isArray(t.evidence) ? t.evidence.length : 0;
+    return '<tr><td>' + escapeHtml(t.name || '') + '</td><td>' + escapeHtml(STAGE_LABELS[stageKey]) + '</td><td>' + count + '</td></tr>';
+  }).join('');
+  compareCard.innerHTML =
+    '<label>Opportunity comparison</label>' +
+    '<table><thead><tr><th>Theme</th><th>Journey stage</th><th># of comments</th></tr></thead><tbody>' + rows + '</tbody></table>';
+  resultsEl.appendChild(compareCard);
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function truncate(s, n) {
+  return s.length > n ? s.slice(0, n - 1) + '\u2026' : s;
+}
+
+// A real result from an earlier run on the sample set above — shown instantly with no API call,
+// so the workflow can always be demonstrated even if the live analysis is rate-limited.
+const CACHED_RESULT = {
+  themes: [
+    {
+      name: "Search fails to use the specific clue people give it",
+      stage: "understanding",
+      description: "People do give the search a real clue — a place, a word written in the photo, two subjects at once — but the search doesn't use it correctly and returns nothing useful.",
+      evidence: [
+        { summary: "Typing a word/phrase that appears in a photo used to work; now has to ask the AI instead and it fails.", source_index: 2, photo_type: "document_or_screenshot", remembered_clue: "a specific word or phrase written in the photo", forgotten_detail: "" },
+        { summary: "Can't even find a simple, plain photo of an animal anymore.", source_index: 6, photo_type: "object", remembered_clue: "a simple, clear subject in the photo", forgotten_detail: "" },
+        { summary: "Remembers the exact place a photo was taken but not the year; doesn't want a location-only search buried in thousands of results.", source_index: 7, photo_type: "place", remembered_clue: "the specific location", forgotten_detail: "the year / roughly when it was taken" },
+        { summary: "Searching two subjects together (cats and dogs) only returns one, not both — has to search separately and cross-check by hand.", source_index: 8, photo_type: "object", remembered_clue: "two different subjects together in one memory", forgotten_detail: "" }
+      ]
+    },
+    {
+      name: "People stop trusting the AI search and go back to old habits",
+      stage: "trusting",
+      description: "Even when the new AI-powered search exists, people don't rely on it — some are disappointed enough to say so publicly, and even Google's own team has admitted it isn't good enough yet.",
+      evidence: [
+        { summary: "Longtime user disappointed, says the app used to be the clear best-in-class before the AI changes.", source_index: 3, photo_type: "unspecified", remembered_clue: "", forgotten_detail: "" },
+        { summary: "Google's own product manager publicly admitted the new AI search isn't good enough on speed, accuracy or experience.", source_index: 4, photo_type: "unspecified", remembered_clue: "", forgotten_detail: "" },
+        { summary: "Google had to add a toggle to switch back to the old 'classic' search after complaints it was less accurate.", source_index: 5, photo_type: "unspecified", remembered_clue: "", forgotten_detail: "" }
+      ]
+    },
+    {
+      name: "Results don't carry enough context to tell photos apart",
+      stage: "judging",
+      description: "Search does return something, but without dates or trip context attached, people can't tell which result is the one they actually meant.",
+      evidence: [
+        { summary: "Misses being able to see dates on results, making it hard to tell which trip a photo is from.", source_index: 9, photo_type: "event", remembered_clue: "roughly which trip or occasion", forgotten_detail: "the exact date, to tell similar trips apart" }
+      ]
+    },
+    {
+      name: "Reorganized menus make previously-easy content hard to reach again",
+      stage: "recovering",
+      description: "After a redesign, things that used to take one tap now take several menu layers, so even content the person knows exists becomes hard to get back to.",
+      evidence: [
+        { summary: "Shared albums and conversations now buried several settings-menus deep after a redesign.", source_index: 1, photo_type: "unspecified", remembered_clue: "", forgotten_detail: "" }
+      ]
+    }
+  ]
+};
+
+document.getElementById('runBtn').addEventListener('click', run);
+document.getElementById('cachedBtn').addEventListener('click', () => {
+  document.getElementById('error').style.display = 'none';
+  document.getElementById('results').innerHTML = '';
+  document.getElementById('status').textContent = 'Showing a cached example result (from an earlier run on the sample set) — not a live call.';
+  renderThemes(CACHED_RESULT, SAMPLE);
+});
+
+// --- Owner-only controls: save & clear are only shown to the creator ---
+async function setupOwnerControls() {
+  const ownerNote = document.getElementById('dbOwnerNote');
+  try {
+    const user = await claude.use('user');
+    const isOwner = !!(user && typeof user.isOwner === 'function' && user.isOwner());
+    if (isOwner) {
+      document.getElementById('saveDbBtn').style.display = '';
+      document.getElementById('clearDbBtn').style.display = '';
+      ownerNote.textContent = 'You\u2019re viewing as the creator, so you can also save new lines and clear the set.';
+    }
+  } catch (e) {
+    // if the user capability isn't available, keep save/clear hidden (safe default)
+  }
+}
+setupOwnerControls();
+
+// --- Review database (persists across sessions using the db capability) ---
+let dbNamespace = null;
+async function getDb() {
+  if (dbNamespace) return dbNamespace;
+  dbNamespace = await claude.use('db');
+  return dbNamespace;
+}
+
+async function refreshDbCount() {
+  const countEl = document.getElementById('dbCount');
+  const db = await getDb();
+  if (!db) {
+    countEl.textContent = '(database unavailable in this view)';
+    return;
+  }
+  try {
+    const docs = await db.collection('reviews').get();
+    const n = docs && docs.docs ? docs.docs.length : (Array.isArray(docs) ? docs.length : 0);
+    countEl.textContent = '\u2014 currently ' + n + ' review(s) saved.';
+  } catch (e) {
+    countEl.textContent = '';
+  }
+}
+refreshDbCount();
+
+document.getElementById('saveDbBtn').addEventListener('click', async () => {
+  const dbStatus = document.getElementById('dbStatus');
+  const db = await getDb();
+  if (!db) { dbStatus.textContent = 'Database isn\u2019t available in this view.'; return; }
+  const lines = document.getElementById('input').value.split('\n').map(s => s.trim()).filter(Boolean);
+  if (lines.length === 0) { dbStatus.textContent = 'Nothing to save — the box is empty.'; return; }
+  dbStatus.textContent = 'Saving ' + lines.length + ' line(s)\u2026';
+  try {
+    for (const line of lines) {
+      const id = 'r_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+      await db.doc('reviews/' + id).set({ text: line, addedAt: Date.now() });
+    }
+    dbStatus.textContent = 'Saved ' + lines.length + ' line(s) to the database.';
+    refreshDbCount();
+  } catch (e) {
+    dbStatus.textContent = 'Save failed: ' + (e && e.message ? e.message : 'try again.');
+  }
+});
+
+document.getElementById('loadDbBtn').addEventListener('click', async () => {
+  const dbStatus = document.getElementById('dbStatus');
+  const db = await getDb();
+  if (!db) { dbStatus.textContent = 'Database isn\u2019t available in this view.'; return; }
+  dbStatus.textContent = 'Loading saved reviews\u2026';
+  try {
+    const snap = await db.collection('reviews').orderBy('addedAt').get();
+    const docs = snap && snap.docs ? snap.docs : [];
+    const texts = docs.map(d => (d.data ? d.data() : d).text).filter(Boolean);
+    if (texts.length === 0) {
+      dbStatus.textContent = 'No saved reviews yet — save some first.';
+      return;
+    }
+    document.getElementById('input').value = texts.join('\n');
+    dbStatus.textContent = 'Loaded ' + texts.length + ' saved review(s) into the box above.';
+  } catch (e) {
+    dbStatus.textContent = 'Load failed: ' + (e && e.message ? e.message : 'try again.');
+  }
+});
+
+document.getElementById('clearDbBtn').addEventListener('click', async () => {
+  const dbStatus = document.getElementById('dbStatus');
+  const db = await getDb();
+  if (!db) { dbStatus.textContent = 'Database isn\u2019t available in this view.'; return; }
+  if (!confirm('Delete every saved review from the database? This can\u2019t be undone.')) return;
+  dbStatus.textContent = 'Clearing\u2026';
+  try {
+    const snap = await db.collection('reviews').get();
+    const docs = snap && snap.docs ? snap.docs : [];
+    for (const d of docs) {
+      await db.doc('reviews/' + d.id).delete();
+    }
+    dbStatus.textContent = 'Database cleared.';
+    refreshDbCount();
+  } catch (e) {
+    dbStatus.textContent = 'Clear failed: ' + (e && e.message ? e.message : 'try again.');
+  }
+});
+</script>
+</body>
+</html>
