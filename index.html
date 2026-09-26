@@ -45,18 +45,29 @@
 
   <h1>Photo Retrieval Discovery Engine</h1>
   <p class="sub">
-    An AI-powered tool that reads real user complaints about failing to find an old photo in Google Photos, and
-    sorts them into concrete failure patterns. This page is fully public — no login needed — and includes both
-    a real result from 250 collected reviews, and a live tool below where you can paste your own reviews and run
-    a fresh analysis yourself.
+    Google Photos users often remember <em>something</em> about an old photo — a place, an event, a person — but
+    not enough to type a search that actually finds it. This tool reads real user complaints at scale and turns
+    messy reviews into a clear map of exactly where and why retrieval fails, instead of just doing sentiment
+    analysis. Fully public, no login needed, and genuinely interactive — paste your own reviews below and watch
+    it analyze them live.
   </p>
+
+  <div class="card" style="border-left: 5px solid var(--stage5); border-top:none; border-right:none; border-bottom:none; border-radius:10px;">
+    <span class="badge">Key finding</span>
+    <p class="sub" style="font-size:0.92rem; margin:4px 0 0;">
+      Google already ships a conversational "describe what you remember" search feature (Ask Photos, 2024). The
+      real, evidence-backed gap isn't the absence of natural-language search — it's that real users don't trust
+      it yet and are reverting to old keyword-search habits. That reframes the opportunity from "build vague
+      search" to "make AI-assisted retrieval something people actually rely on."
+    </p>
+  </div>
 
   <div class="card">
     <h2>Data quality — an honest note</h2>
     <div class="stat-row">
-      <div class="stat"><div class="num">250</div><div class="label">reviews collected</div></div>
+      <div class="stat"><div class="num" id="baseCount">250</div><div class="label">reviews collected (baseline)</div></div>
       <div class="stat"><div class="num">28</div><div class="label">genuinely about retrieval (~11%)</div></div>
-      <div class="stat"><div class="num">0</div><div class="label">fabricated — all real, sourced</div></div>
+      <div class="stat"><div class="num" id="liveCount">0</div><div class="label">analyzed live from this browser</div></div>
     </div>
     <p class="sub" style="font-size:0.85rem;">
       The keyword filter used to collect these reviews was intentionally broad, which pulled in a lot of unrelated
@@ -128,14 +139,14 @@
   <div class="card">
     <h2>Try it yourself — live analysis, right here, no login</h2>
     <p class="sub" style="font-size:0.88rem;">
-      Paste your own real reviews/comments below and this page will call Claude directly from your browser to
-      classify them, live. You'll need your own free Anthropic API key (get one in ~2 minutes at
-      <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>) — this keeps the analysis
-      independent of any one person's account or usage limits. Your key is used only to make this one request
-      directly from your browser to Anthropic; it is never stored, logged, or sent anywhere else.
+      Paste your own real reviews/comments below and this page will call Google's Gemini AI directly from your
+      browser to classify them, live. You'll need a free Google Gemini API key — get one in under a minute at
+      <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com/apikey</a> (just sign in
+      with any Google account — <strong>no credit card, ever</strong>). Your key is used only to make this one
+      request directly from your browser to Google; it is never stored, logged, or sent anywhere else.
     </p>
-    <label for="apiKey">Your Anthropic API key</label>
-    <input type="password" id="apiKey" placeholder="sk-ant-..." />
+    <label for="apiKey">Your Google Gemini API key (free)</label>
+    <input type="password" id="apiKey" placeholder="AIza..." />
     <div style="height:12px;"></div>
     <label for="input">Reviews / comments to analyze (one per line, up to ~60 lines per run)</label>
     <textarea id="input" placeholder="Paste real user comments here, one per line..."></textarea>
@@ -183,6 +194,11 @@ function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
+// Running count of reviews analyzed live from this browser, persisted so it feels real across visits.
+function getLiveCount() { return parseInt(localStorage.getItem('discoveryEngineLiveCount') || '0', 10); }
+function setLiveCount(n) { localStorage.setItem('discoveryEngineLiveCount', String(n)); document.getElementById('liveCount').textContent = n; }
+setLiveCount(getLiveCount());
+
 function buildPrompt(lines) {
   return [
     "You are helping analyze real user complaints about failing to find an old photo they remember in Google Photos.",
@@ -216,26 +232,22 @@ document.getElementById('runBtn').addEventListener('click', async () => {
   const apiKey = document.getElementById('apiKey').value.trim();
   const lines = document.getElementById('input').value.split('\n').map(s => s.trim()).filter(Boolean);
 
-  if (!apiKey) { errorEl.textContent = 'Enter your Anthropic API key first.'; errorEl.style.display = 'block'; return; }
+  if (!apiKey) { errorEl.textContent = 'Enter your Gemini API key first.'; errorEl.style.display = 'block'; return; }
   if (lines.length === 0) { errorEl.textContent = 'Paste at least one comment first.'; errorEl.style.display = 'block'; return; }
   if (lines.length > 60) { errorEl.textContent = 'Please keep it to 60 lines or fewer per run for this demo.'; errorEl.style.display = 'block'; return; }
 
   runBtn.disabled = true;
-  statusEl.textContent = 'Calling Claude directly from your browser...';
+  statusEl.textContent = 'Calling Gemini directly from your browser...';
 
   try {
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    const resp = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent', {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
+        'x-goog-api-key': apiKey
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-5',
-        max_tokens: 2000,
-        messages: [{ role: 'user', content: buildPrompt(lines) }]
+        contents: [{ parts: [{ text: buildPrompt(lines) }] }]
       })
     });
 
@@ -245,12 +257,15 @@ document.getElementById('runBtn').addEventListener('click', async () => {
     }
 
     const data = await resp.json();
-    const textBlock = (data.content || []).find(c => c.type === 'text');
-    if (!textBlock) throw new Error('No text in response.');
-    let cleaned = textBlock.text.trim().replace(/^```json/i, '').replace(/^```/, '').replace(/```$/, '').trim();
+    const textOut = data.candidates && data.candidates[0] && data.candidates[0].content &&
+      data.candidates[0].content.parts && data.candidates[0].content.parts[0] &&
+      data.candidates[0].content.parts[0].text;
+    if (!textOut) throw new Error('No text in response.');
+    let cleaned = textOut.trim().replace(/^```json/i, '').replace(/^```/, '').replace(/```$/, '').trim();
     const parsed = JSON.parse(cleaned);
 
     statusEl.textContent = 'Done — found ' + (parsed.themes ? parsed.themes.length : 0) + ' theme(s).';
+    setLiveCount(getLiveCount() + lines.length);
     renderLive(parsed, lines);
   } catch (err) {
     errorEl.textContent = 'Failed: ' + (err && err.message ? err.message : 'try again.');
