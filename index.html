@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Photo Retrieval Discovery Engine — Findings</title>
+<title>Photo Retrieval Discovery Engine</title>
 <style>
   :root {
     --bg: #faf9f7; --surface: #ffffff; --ink: #1c1b1a; --ink-soft: #5b5750;
@@ -14,9 +14,9 @@
   body { background: var(--bg); color: var(--ink); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif; margin: 0; }
   .wrap { max-width: 880px; margin: 0 auto; padding: 32px 20px 70px; }
   h1 { font-size: 1.6rem; margin: 0 0 8px; }
+  h2 { font-size: 1.05rem; }
   .sub { color: var(--ink-soft); font-size: 0.95rem; line-height: 1.55; max-width: 65ch; }
   .card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 20px 22px; margin: 18px 0; }
-  .card h2 { font-size: 1.05rem; margin: 0 0 10px; }
   .badge { display: inline-block; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; background: var(--accent-soft); color: var(--ink-soft); padding: 3px 10px; border-radius: 999px; margin-bottom: 8px; }
   .stat-row { display: flex; gap: 16px; flex-wrap: wrap; margin: 14px 0; }
   .stat { flex: 1; min-width: 140px; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
@@ -30,17 +30,25 @@
   .legend-item .q { color: var(--ink-soft); font-size: 0.78rem; }
   .footer-note { font-size: 0.8rem; color: var(--ink-soft); line-height: 1.6; border-top: 1px solid var(--line); padding-top: 16px; margin-top: 30px; }
   a { color: var(--accent); }
+  label { display:block; font-size:0.8rem; font-weight:600; color: var(--ink-soft); margin-bottom:6px; text-transform:uppercase; letter-spacing:0.04em; }
+  textarea, input[type="password"] { width:100%; background: var(--bg); color: var(--ink); border:1px solid var(--line); border-radius:10px; padding:10px 12px; font-size:0.9rem; font-family:inherit; }
+  textarea { min-height:160px; resize:vertical; line-height:1.5; }
+  button { background: var(--accent); color:#fff; border:none; border-radius:10px; padding:11px 18px; font-size:0.92rem; font-weight:600; cursor:pointer; }
+  button:disabled { opacity:0.55; cursor:default; }
+  .hint { font-size:0.8rem; color:var(--ink-soft); line-height:1.5; margin-top:6px; }
+  .error { color: var(--accent); font-size:0.85rem; margin-top:8px; }
+  .status { font-size:0.85rem; color: var(--ink-soft); margin-top:8px; }
 </style>
 </head>
 <body>
 <div class="wrap">
 
-  <h1>Photo Retrieval Discovery Engine — Findings from 250 Real Reviews</h1>
+  <h1>Photo Retrieval Discovery Engine</h1>
   <p class="sub">
-    This page shows the actual output of the discovery engine after analyzing 250 real, recent Google Photos
-    Play Store reviews. It's a static snapshot so it works for anyone, anywhere, with no sign-in required.
-    For the live interactive version (paste your own reviews and get a fresh AI analysis), see the
-    <a href="https://claude.ai/artifact/Nd764ScX8F5d6MthGM21cF" target="_blank">interactive tool</a> (needs a free Claude account).
+    An AI-powered tool that reads real user complaints about failing to find an old photo in Google Photos, and
+    sorts them into concrete failure patterns. This page is fully public — no login needed — and includes both
+    a real result from 250 collected reviews, and a live tool below where you can paste your own reviews and run
+    a fresh analysis yourself.
   </p>
 
   <div class="card">
@@ -51,12 +59,9 @@
       <div class="stat"><div class="num">0</div><div class="label">fabricated — all real, sourced</div></div>
     </div>
     <p class="sub" style="font-size:0.85rem;">
-      The keyword filter used to collect these reviews was intentionally broad (matched words like "update",
-      "album", "memory"), which pulled in a lot of reviews that turn out to be unrelated — app crashes,
-      subscription complaints, accidental photo deletion, layout changes. Only the 28 reviews below are actually
-      about failing to find a remembered photo. The themes and counts on this page are based on those 28, not
-      all 250. This is a known limitation of keyword-based filtering; a next iteration would use an AI relevance
-      check before clustering, not just keyword matching.
+      The keyword filter used to collect these reviews was intentionally broad, which pulled in a lot of unrelated
+      reviews (app crashes, subscription complaints, layout changes). Only the 28 below are genuinely about failing
+      to find a remembered photo. The themes below are based on those 28.
     </p>
   </div>
 
@@ -70,8 +75,7 @@
       <p class="sub" style="font-size:0.85rem; margin:0;">
         A real finding, not an oversight: app reviews are written after someone has already tried and failed to
         search, so they don't capture the earlier moment of struggling to put a fuzzy memory into words. That
-        moment can only really be captured through direct user interviews — which is exactly what Part 3 of this
-        project is for.
+        moment can only really be captured through direct user interviews.
       </p>
     </div>
 
@@ -122,6 +126,29 @@
   </div>
 
   <div class="card">
+    <h2>Try it yourself — live analysis, right here, no login</h2>
+    <p class="sub" style="font-size:0.88rem;">
+      Paste your own real reviews/comments below and this page will call Claude directly from your browser to
+      classify them, live. You'll need your own free Anthropic API key (get one in ~2 minutes at
+      <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>) — this keeps the analysis
+      independent of any one person's account or usage limits. Your key is used only to make this one request
+      directly from your browser to Anthropic; it is never stored, logged, or sent anywhere else.
+    </p>
+    <label for="apiKey">Your Anthropic API key</label>
+    <input type="password" id="apiKey" placeholder="sk-ant-..." />
+    <div style="height:12px;"></div>
+    <label for="input">Reviews / comments to analyze (one per line, up to ~60 lines per run)</label>
+    <textarea id="input" placeholder="Paste real user comments here, one per line..."></textarea>
+    <div class="hint">Example: "I remember the café was in Goa but I can't find the photo — search only shows random results."</div>
+    <div style="margin-top:14px;">
+      <button id="runBtn">Run live analysis</button>
+      <span class="status" id="status"></span>
+    </div>
+    <div class="error" id="error" style="display:none;"></div>
+    <div id="liveResults" style="margin-top:16px;"></div>
+  </div>
+
+  <div class="card">
     <h2>What do "Stage 1–5" mean?</h2>
     <div class="legend-item"><strong>Stage 1 · Expressing —</strong> the person can't put a fuzzy memory into words specific enough to search with.<div class="q">From: "Is the user unable to express what they remember?"</div></div>
     <div class="legend-item"><strong>Stage 2 · Understanding —</strong> a real clue was given, but the search failed to read or use it correctly.<div class="q">From: "Does Google Photos fail to understand the clues they provide?"</div></div>
@@ -137,5 +164,128 @@
   </div>
 
 </div>
+
+<script>
+const STAGE_LABELS = {
+  expressing: "Stage 1 · Putting the memory into words",
+  understanding: "Stage 2 · Search understanding the clue",
+  judging: "Stage 3 · Judging the results shown",
+  recovering: "Stage 4 · Recovering from a failed search",
+  trusting: "Stage 5 · Trusting / bothering to use the AI search",
+  other: "Not directly relevant"
+};
+const STAGE_COLOR = {
+  expressing: "var(--accent)", understanding: "var(--stage2)", judging: "var(--stage3)",
+  recovering: "var(--stage4)", trusting: "var(--stage5)", other: "var(--stage-other)"
+};
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function buildPrompt(lines) {
+  return [
+    "You are helping analyze real user complaints about failing to find an old photo they remember in Google Photos.",
+    "",
+    "Classify each comment into one of these stages:",
+    "1. expressing — struggles to put a fuzzy memory into words at all",
+    "2. understanding — gave a real clue (place, time, object, word) but the search failed to use it correctly",
+    "3. judging — got results back but can't tell which one (if any) is right, often missing context like dates",
+    "4. recovering — first search failed, no good way to refine or narrow it, forced to start over or scroll manually",
+    "5. trusting — an AI/conversational search feature exists but the person avoids, distrusts, or reverts from it",
+    "6. other — unrelated to vague-memory photo retrieval",
+    "",
+    "Group similar comments into named themes. Return ONLY valid JSON, no markdown fences, no commentary, in this exact shape:",
+    '{"themes":[{"name":"short theme name","stage":"expressing|understanding|judging|recovering|trusting|other","description":"1-2 plain sentences","evidence":[{"summary":"short paraphrase under 20 words","source_index":0}]}]}',
+    "",
+    "Every comment must appear in exactly one theme's evidence using its 0-based index. Do not invent comments.",
+    "",
+    "Comments:",
+    lines.map((l, i) => i + ". " + l).join("\n")
+  ].join("\n");
+}
+
+document.getElementById('runBtn').addEventListener('click', async () => {
+  const errorEl = document.getElementById('error');
+  const statusEl = document.getElementById('status');
+  const resultsEl = document.getElementById('liveResults');
+  const runBtn = document.getElementById('runBtn');
+  errorEl.style.display = 'none';
+  resultsEl.innerHTML = '';
+
+  const apiKey = document.getElementById('apiKey').value.trim();
+  const lines = document.getElementById('input').value.split('\n').map(s => s.trim()).filter(Boolean);
+
+  if (!apiKey) { errorEl.textContent = 'Enter your Anthropic API key first.'; errorEl.style.display = 'block'; return; }
+  if (lines.length === 0) { errorEl.textContent = 'Paste at least one comment first.'; errorEl.style.display = 'block'; return; }
+  if (lines.length > 60) { errorEl.textContent = 'Please keep it to 60 lines or fewer per run for this demo.'; errorEl.style.display = 'block'; return; }
+
+  runBtn.disabled = true;
+  statusEl.textContent = 'Calling Claude directly from your browser...';
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-5',
+        max_tokens: 2000,
+        messages: [{ role: 'user', content: buildPrompt(lines) }]
+      })
+    });
+
+    if (!resp.ok) {
+      const errText = await resp.text();
+      throw new Error('API returned ' + resp.status + ': ' + errText.slice(0, 200));
+    }
+
+    const data = await resp.json();
+    const textBlock = (data.content || []).find(c => c.type === 'text');
+    if (!textBlock) throw new Error('No text in response.');
+    let cleaned = textBlock.text.trim().replace(/^```json/i, '').replace(/^```/, '').replace(/```$/, '').trim();
+    const parsed = JSON.parse(cleaned);
+
+    statusEl.textContent = 'Done — found ' + (parsed.themes ? parsed.themes.length : 0) + ' theme(s).';
+    renderLive(parsed, lines);
+  } catch (err) {
+    errorEl.textContent = 'Failed: ' + (err && err.message ? err.message : 'try again.');
+    errorEl.style.display = 'block';
+    statusEl.textContent = '';
+  } finally {
+    runBtn.disabled = false;
+  }
+});
+
+function renderLive(result, raw) {
+  const resultsEl = document.getElementById('liveResults');
+  if (!result || !Array.isArray(result.themes)) { resultsEl.innerHTML = '<div class="hint">No structured result came back.</div>'; return; }
+  const wrap = document.createElement('div');
+  result.themes.forEach(theme => {
+    const stageKey = STAGE_LABELS[theme.stage] ? theme.stage : 'other';
+    const el = document.createElement('div');
+    el.className = 'theme';
+    el.style.borderLeftColor = STAGE_COLOR[stageKey];
+    const evCount = Array.isArray(theme.evidence) ? theme.evidence.length : 0;
+    let evHtml = '';
+    (theme.evidence || []).forEach(ev => {
+      const orig = (typeof ev.source_index === 'number' && raw[ev.source_index]) ? raw[ev.source_index] : '';
+      evHtml += '<li>' + escapeHtml(ev.summary || '') + (orig ? ' <span class="hint">(' + escapeHtml(orig.slice(0, 90)) + (orig.length > 90 ? '…' : '') + ')</span>' : '') + '</li>';
+    });
+    el.innerHTML =
+      '<span class="badge">' + escapeHtml(STAGE_LABELS[stageKey]) + '</span>' +
+      '<h3>' + escapeHtml(theme.name || 'Untitled') + '</h3>' +
+      '<div class="count">' + evCount + ' comment(s)</div>' +
+      '<p class="sub" style="font-size:0.88rem; margin:6px 0;">' + escapeHtml(theme.description || '') + '</p>' +
+      '<ul class="evidence">' + evHtml + '</ul>';
+    wrap.appendChild(el);
+  });
+  resultsEl.appendChild(wrap);
+}
+</script>
 </body>
 </html>
