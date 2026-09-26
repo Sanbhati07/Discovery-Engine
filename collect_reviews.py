@@ -15,8 +15,14 @@ Then run:
 """
 
 from google_play_scraper import reviews, Sort
-from app_store_scraper import AppStore
 import re
+
+try:
+    from app_store_scraper import AppStore
+    APP_STORE_AVAILABLE = True
+except Exception as e:
+    APP_STORE_AVAILABLE = False
+    print(f"(App Store scraper not available/broken on this machine, skipping it: {e})")
 
 # Keywords that suggest the review is actually about search / retrieval, not something unrelated
 # (storage, pricing, sync bugs, etc). Feel free to add more words you notice while reading.
@@ -65,6 +71,9 @@ def collect_play_store(app_id="com.google.android.apps.photos", target=250):
 
 
 def collect_app_store(app_name="google-photos", app_id=962194608, target=100):
+    if not APP_STORE_AVAILABLE:
+        print("Skipping App Store (library not working on this machine) — collect a few reviews manually from apps.apple.com instead.")
+        return []
     print(f"Fetching App Store reviews for {app_name} ...")
     collected = []
     try:
