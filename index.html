@@ -139,19 +139,18 @@
   <div class="card">
     <h2>Try it yourself — live analysis, right here, no login</h2>
     <p class="sub" style="font-size:0.88rem;">
-      Paste your own real reviews/comments below and this page will call Google's Gemini AI directly from your
-      browser to classify them, live. You'll need a free Google Gemini API key — get one in under a minute at
-      <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com/apikey</a> <p>or simply use my key</p> <a>"AQ.Ab8RN6JY4bON_VvXcpWfUs2_HJIcWf9-cGg9K_K31WF4vxL-lg". However, if the limit is used, please use yours to check </a> Your key is used only to make this one
-      request directly from your browser to Google; it is never stored, logged, or sent anywhere else.
+      Paste your own real reviews/comments below and click Analyze — this runs instantly in your browser using a
+      transparent, rule-based classifier, so it always works: no API key, no login, no external service, no cost,
+      ever. <em>(The 250-review findings above were analyzed using Claude AI directly; this live demo uses a fast
+      local pattern-matcher instead of a live LLM call, specifically so it never depends on any account, key, or
+      provider's uptime — full methodology and the AI-based analysis process are in the
+      <a href="https://github.com/Sanbhati07/Discovery-Engine" target="_blank">GitHub repo</a>.)</em>
     </p>
-    <label for="apiKey">Your Google Gemini API key (free)</label>
-    <input type="password" id="apiKey" placeholder="AIza..." />
-    <div style="height:12px;"></div>
-    <label for="input">Reviews / comments to analyze (one per line, up to ~60 lines per run)</label>
+    <label for="input">Reviews / comments to analyze (one per line)</label>
     <textarea id="input" placeholder="Paste real user comments here, one per line..."></textarea>
     <div class="hint">Example: "I remember the café was in Goa but I can't find the photo — search only shows random results."</div>
     <div style="margin-top:14px;">
-      <button id="runBtn">Run live analysis</button>
+      <button id="runBtn">Analyze now</button>
       <span class="status" id="status"></span>
     </div>
     <div class="error" id="error" style="display:none;"></div>
@@ -220,60 +219,54 @@ function buildPrompt(lines) {
   ].join("\n");
 }
 
-document.getElementById('runBtn').addEventListener('click', async () => {
+const RULES = [
+  { stage: 'trusting', words: ['gemini', 'ai search', 'ai assistant', 'ask photos', 'trust', 'on purpose', 'deliberately', 'push', 'revert', 'classic search', 'used to be amazing', 'worse now', 'declined'] },
+  { stage: 'understanding', words: ['searched', 'search for', 'typed', 'keyword', 'face', 'address', 'text', "doesn't find", "didn't find", 'no results', 'only 15', 'none', 'nothing came up', "couldn't find"] },
+  { stage: 'judging', words: ['which one', 'too many', 'context', 'by date', 'by event', 'select multiple', 'sort by', 'tell them apart', 'similar photos'] },
+  { stage: 'recovering', words: ['scroll', 'refine', 'narrow', 'start over', 'locked', 'requires turning on', 'migraine', 'manually', 'no way to'] },
+  { stage: 'expressing', words: ["don't remember exactly", "can't describe", "not sure when", "not sure what", "vague memory", "something like"] }
+];
+
+function classifyLine(line) {
+  const lower = line.toLowerCase();
+  let best = { stage: 'other', score: 0 };
+  RULES.forEach(rule => {
+    const score = rule.words.reduce((acc, w) => acc + (lower.includes(w) ? 1 : 0), 0);
+    if (score > best.score) best = { stage: rule.stage, score };
+  });
+  return best.stage;
+}
+
+function runClassifier() {
   const errorEl = document.getElementById('error');
   const statusEl = document.getElementById('status');
   const resultsEl = document.getElementById('liveResults');
-  const runBtn = document.getElementById('runBtn');
   errorEl.style.display = 'none';
   resultsEl.innerHTML = '';
 
-  const apiKey = document.getElementById('apiKey').value.trim();
   const lines = document.getElementById('input').value.split('\n').map(s => s.trim()).filter(Boolean);
-
-  if (!apiKey) { errorEl.textContent = 'Enter your Gemini API key first.'; errorEl.style.display = 'block'; return; }
   if (lines.length === 0) { errorEl.textContent = 'Paste at least one comment first.'; errorEl.style.display = 'block'; return; }
-  if (lines.length > 60) { errorEl.textContent = 'Please keep it to 60 lines or fewer per run for this demo.'; errorEl.style.display = 'block'; return; }
 
-  runBtn.disabled = true;
-  statusEl.textContent = 'Calling Gemini directly from your browser...';
+  const byStage = {};
+  lines.forEach((line, i) => {
+    const stage = classifyLine(line);
+    if (!byStage[stage]) byStage[stage] = [];
+    byStage[stage].push({ line, i });
+  });
 
-  try {
-    const resp = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        'x-goog-api-key': apiKey
-      },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: buildPrompt(lines) }] }]
-      })
-    });
+  const themes = Object.keys(byStage).map(stage => ({
+    name: STAGE_LABELS[stage] || 'Not directly relevant',
+    stage,
+    description: '',
+    evidence: byStage[stage].map(e => ({ summary: e.line.slice(0, 100), source_index: e.i }))
+  }));
 
-    if (!resp.ok) {
-      const errText = await resp.text();
-      throw new Error('API returned ' + resp.status + ': ' + errText.slice(0, 200));
-    }
+  statusEl.textContent = 'Done — classified ' + lines.length + ' comment(s) into ' + themes.length + ' group(s).';
+  setLiveCount(getLiveCount() + lines.length);
+  renderLive({ themes }, lines);
+}
 
-    const data = await resp.json();
-    const textOut = data.candidates && data.candidates[0] && data.candidates[0].content &&
-      data.candidates[0].content.parts && data.candidates[0].content.parts[0] &&
-      data.candidates[0].content.parts[0].text;
-    if (!textOut) throw new Error('No text in response.');
-    let cleaned = textOut.trim().replace(/^```json/i, '').replace(/^```/, '').replace(/```$/, '').trim();
-    const parsed = JSON.parse(cleaned);
-
-    statusEl.textContent = 'Done — found ' + (parsed.themes ? parsed.themes.length : 0) + ' theme(s).';
-    setLiveCount(getLiveCount() + lines.length);
-    renderLive(parsed, lines);
-  } catch (err) {
-    errorEl.textContent = 'Failed: ' + (err && err.message ? err.message : 'try again.');
-    errorEl.style.display = 'block';
-    statusEl.textContent = '';
-  } finally {
-    runBtn.disabled = false;
-  }
-});
+document.getElementById('runBtn').addEventListener('click', runClassifier);
 
 function renderLive(result, raw) {
   const resultsEl = document.getElementById('liveResults');
