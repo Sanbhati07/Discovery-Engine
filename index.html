@@ -282,22 +282,26 @@ function buildPrompt(lines) {
   ].join("\n");
 }
 
-const RULES = [
-  { stage: 'trusting', words: ['gemini', 'ai search', 'ai assistant', 'ask photos', 'trust', 'on purpose', 'deliberately', 'push', 'revert', 'classic search', 'used to be amazing', 'worse now', 'declined'] },
-  { stage: 'understanding', words: ['searched', 'search for', 'typed', 'keyword', 'face', 'address', 'text', "doesn't find", "didn't find", 'no results', 'only 15', 'none', 'nothing came up', "couldn't find"] },
-  { stage: 'judging', words: ['which one', 'too many', 'context', 'by date', 'by event', 'select multiple', 'sort by', 'tell them apart', 'similar photos'] },
-  { stage: 'recovering', words: ['scroll', 'refine', 'narrow', 'start over', 'locked', 'requires turning on', 'migraine', 'manually', 'no way to'] },
-  { stage: 'expressing', words: ["don't remember exactly", "can't describe", "not sure when", "not sure what", "vague memory", "something like"] }
-];
+const RULES = {
+  trusting: ['gemini', 'ai search', 'ai assistant', 'ask photos', 'trust', 'on purpose', 'deliberately', 'push', 'revert', 'classic search', 'used to be amazing', 'worse now', 'declined', 'useless ai', 'worthless'],
+  judging: ['which one', 'too many', 'context', 'by date', 'by event', 'select multiple', 'sort by', "can't tell", "cant tell", 'wrong ones', 'irrelevant results', 'not sure which', 'mixed up'],
+  recovering: ['scroll', 'refine', 'narrow', 'start over', 'locked', 'requires turning on', 'migraine', 'manually', 'no way to', 'have to go through', 'forced to'],
+  expressing: ["don't remember exactly", "dont remember exactly", "can't describe", "cant describe", "not sure when", "not sure what", "vague memory", "hard to explain", "hard to put into words"],
+  understanding: ['search', 'searched', 'searching', 'find', 'found', 'looking for', 'keyword', 'address', 'location', 'typed', 'shows all', 'shows photos', 'other state', 'not related', 'irrelevant', 'wrong photos', "doesn't find", "didn't find", "does not find", "did not find", 'no results', 'nothing came up', "couldn't find", "could not find", 'none', 'only 15', 'still shows', 'not in', 'do not remember', "don't remember", 'remember the']
+};
 
 function classifyLine(line) {
   const lower = line.toLowerCase();
-  let best = { stage: 'other', score: 0 };
-  RULES.forEach(rule => {
-    const score = rule.words.reduce((acc, w) => acc + (lower.includes(w) ? 1 : 0), 0);
-    if (score > best.score) best = { stage: rule.stage, score };
+  const specificStages = ['trusting', 'judging', 'recovering', 'expressing'];
+  let best = { stage: null, score: 0 };
+  specificStages.forEach(stage => {
+    const score = RULES[stage].reduce((acc, w) => acc + (lower.includes(w) ? 1 : 0), 0);
+    if (score > best.score) best = { stage, score };
   });
-  return best.stage;
+  if (best.stage) return best.stage;
+  const uScore = RULES.understanding.reduce((acc, w) => acc + (lower.includes(w) ? 1 : 0), 0);
+  if (uScore > 0) return 'understanding';
+  return 'other';
 }
 
 function runClassifier() {
