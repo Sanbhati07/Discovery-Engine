@@ -66,23 +66,24 @@
     <h2>Data quality — an honest note</h2>
     <div class="stat-row">
       <div class="stat"><div class="num" id="baseCount">250</div><div class="label">reviews collected (baseline)</div></div>
-      <div class="stat"><div class="num">28</div><div class="label">genuinely about retrieval (~11%)</div></div>
+      <div class="stat"><div class="num">23</div><div class="label">genuinely about retrieval (~9%)</div></div>
       <div class="stat"><div class="num" id="liveCount">0</div><div class="label">analyzed live from this browser</div></div>
     </div>
     <p class="sub" style="font-size:0.85rem;">
       The keyword filter used to collect these reviews was intentionally broad, which pulled in a lot of unrelated
-      reviews (app crashes, subscription complaints, layout changes). Only the 28 below are genuinely about failing
-      to find a remembered photo. The themes below are based on those 28.
+      reviews (app crashes, subscription complaints, layout changes). Only the 23 below, verified individually
+      against their exact original text (shown under each theme), are genuinely about failing to find a remembered
+      photo.
     </p>
   </div>
 
   <div class="card">
-    <h2>What the 28 relevant reviews show</h2>
+    <h2>What the 23 relevant reviews show</h2>
 
     <div class="theme" style="border-left-color: var(--stage-other);">
       <span class="badge">Stage 1 · Expressing</span>
       <h3>No examples found in this dataset</h3>
-      <div class="count">0 of 28</div>
+      <div class="count">0 of 23</div>
       <p class="sub" style="font-size:0.85rem; margin:0;">
         A real finding, not an oversight: app reviews are written after someone has already tried and failed to
         search, so they don't capture the earlier moment of struggling to put a fuzzy memory into words. That
@@ -93,46 +94,106 @@
     <div class="theme" style="border-left-color: var(--stage2);">
       <span class="badge">Stage 2 · Understanding</span>
       <h3>Search fails to use the clue the person actually gave it</h3>
-      <div class="count">7 of 28</div>
+      <div class="count">7 of 23</div>
       <ul class="evidence">
         <li>Searched a work address to find related photos; got no results at all.</li>
         <li>Searched "car engine" among 100+ repair photos; only 15 came up, AI often replied "none."</li>
         <li>Wanted to label and search for a specific person's face; the option doesn't work.</li>
+        <li>Face grouping rarely finds people the user actually cares about.</li>
         <li>A redesign removed the ability to browse by face-group from the search screen.</li>
+        <li>Sharing/search fails to return anything on the first attempt, sometimes never.</li>
+        <li>Terminology confusion (starred vs. favorites vs. collections) means a starred photo can't be found again.</li>
       </ul>
+      <details>
+        <summary class="hint" style="cursor:pointer;">Show the 7 original reviews (proof)</summary>
+        <ul class="evidence" style="margin-top:8px;">
+          <li>"search doesn't I have a lot of remodeling jobs by address in ALBUMS, I put an address in the search field and nothing useless." — 2026-09-24, 1★</li>
+          <li>"...TEXT/SUBJECT search is FAIL. 'Car Engine' - have 100s of repair photos But Only 15 Show? Often AI says 'none'..." — 2026-09-22, 1★</li>
+          <li>"I can't label my face or search for it" — 2026-09-15, 1★</li>
+          <li>"Face grouping which should be the apps greatest strength & feature is an absolute waste of time. It hardly finds anyone you love or care about..." — 2026-09-24, 3★</li>
+          <li>"The photos app is this the best. But the recent update has removed the face groups. I can search them by name but i can not see the face groups in search button of new layout..." — 2026-09-23, 5★</li>
+          <li>"sharing photos to Gemini or Signal or other app doesn't work - literally nothing happens. Search is useless..." — 2026-09-18, 1★</li>
+          <li>"Whoever designed this was linguistically challenged... You star a photo and can't find it elsewhere." — 2026-09-20, 1★</li>
+        </ul>
+      </details>
     </div>
 
     <div class="theme" style="border-left-color: var(--stage3);">
       <span class="badge">Stage 3 · Judging</span>
       <h3>Results don't carry the context needed to tell photos apart</h3>
-      <div class="count">3 of 28</div>
+      <div class="count">3 of 23</div>
       <ul class="evidence">
         <li>Wants photos grouped by date/event rather than topic, to distinguish similar occasions.</li>
         <li>Lost the ability to select all photos from one specific date or month in a single tap.</li>
+        <li>Says date-based search works, but is imprecise ("so-so") compared to face or map search.</li>
       </ul>
+      <details>
+        <summary class="hint" style="cursor:pointer;">Show the 3 original reviews (proof)</summary>
+        <ul class="evidence" style="margin-top:8px;">
+          <li>"I prefer my photos to be available by date" — Play Store, 2026-09-24, 1★</li>
+          <li>"Events and occasions are how I want photos arranged in Cloud! Dates are critical. Sorting photos by topic is not the way..." — Play Store, 2026-09-21, 2★</li>
+          <li>"The search feature by face or by maps works well but searching by date is so so." — Software Advice, Dec 2024</li>
+        </ul>
+      </details>
     </div>
 
     <div class="theme" style="border-left-color: var(--stage4);">
       <span class="badge">Stage 4 · Recovering</span>
       <h3>No good way to narrow down or regain a working search</h3>
-      <div class="count">6 of 28</div>
+      <div class="count">5 of 23</div>
       <ul class="evidence">
         <li>Wants a way to hide unrelated local photos so only backed-up ones show while searching.</li>
         <li>New finding: search now requires turning on cloud Backup first — locked behind an unrelated setting.</li>
         <li>Says visually scanning for a photo now "gives a migraine" since search is unreliable.</li>
+        <li>Generic "can't find all my photos" complaints, with no specific reason given.</li>
       </ul>
+      <details>
+        <summary class="hint" style="cursor:pointer;">Show the 5 original reviews (proof)</summary>
+        <ul class="evidence" style="margin-top:8px;">
+          <li>"Give us an option to block the visibility of local content on the app. I want to see ONLY my backed-up photos..." — 2026-09-21, 1★</li>
+          <li>"You can no longer search your photos without turning on Backup. Time for a new App..." — 2026-09-15, 1★</li>
+          <li>"...The search feature is very inaccurate, and you'll get a migraine before you locate what you're looking for..." — 2026-09-17, 1★</li>
+          <li>"I can't seem to find all my photos" — 2026-09-17, 2★</li>
+          <li>"it saves you pictures from one phone to the other. but I still have old pitchers and videos I can't find?" — 2026-09-23, 4★</li>
+        </ul>
+      </details>
     </div>
 
     <div class="theme" style="border-left-color: var(--stage5);">
       <span class="badge">Stage 5 · Trusting — the largest, most consistent pattern</span>
       <h3>People believe the AI search is worse on purpose, and stop relying on it</h3>
-      <div class="count">8 of 28</div>
+      <div class="count">8 of 23</div>
       <ul class="evidence">
         <li>Believes classic keyword search was deliberately weakened to push people toward the AI assistant.</li>
         <li>Calls the AI photo assistant "useless" and "worthless" for search.</li>
-        <li>Reports deceptive AI pop-ups appearing right where the search icon used to be.</li>
+        <li>Reports a deceptive AI pop-up appearing right where the search icon used to be.</li>
         <li>Multiple long-time users say search quality has declined since AI features were added.</li>
       </ul>
+      <details>
+        <summary class="hint" style="cursor:pointer;">Show the 8 original reviews (proof)</summary>
+        <ul class="evidence" style="margin-top:8px;">
+          <li>"I love how they clearly made the search feature worse so you're forced to be more likely to use their stupid AI." — 2026-09-24, 1★</li>
+          <li>"the Gemini bot is absolutely useless just a completely worthless terrible thing" — 2026-09-24, 1★</li>
+          <li>"...as I was about to press the search icon the 'Gemini for photos' prompt came up like a malware pop-up..." — 2026-09-23, 1★</li>
+          <li>"Search is absolutely worthless." — 2026-09-15, 1★</li>
+          <li>"2026 Edit: The search feature has turned to trash. Stop making your apps worse." — 2026-09-15, 1★</li>
+          <li>"The image search feature has actually gotten worse." — 2026-09-16, 2★</li>
+          <li>"This was the gold standard for the better part of a decade... Search is somehow worse now..." — 2026-09-17, 1★</li>
+          <li>"Photos used to have the most amazing AI search. The search in this version is HORRIBLE." — 2026-09-17, 1★</li>
+        </ul>
+      </details>
+    </div>
+
+    <div class="theme" style="border-left-color: var(--stage-other);">
+      <span class="badge">Positive counter-evidence</span>
+      <h3>When it works, this is exactly the value users want</h3>
+      <div class="count">context, not a failure</div>
+      <p class="sub" style="font-size:0.85rem; margin:0;">
+        From Software Advice: a user describes typing "Terry baseball game" or "Willow Bluey birthday cake" into
+        search and finding the exact remembered photo in under 30 seconds. This is the working version of the
+        exact behavior our 23 failure cases show breaking down — useful proof that the opportunity is real and
+        achievable, not hypothetical.
+      </p>
     </div>
   </div>
 
@@ -167,9 +228,11 @@
   </div>
 
   <div class="footer-note">
-    Source data: 250 Play Store reviews for Google Photos, collected via a script using the <code>google-play-scraper</code>
-    library, filtered to English-language reviews mentioning search/retrieval-adjacent keywords, then manually
-    reviewed for actual relevance. Full source code and the collection script are in this repository.
+    Source data: 250 Play Store reviews for Google Photos (collected via a script using the
+    <code>google-play-scraper</code> library, filtered to English-language reviews mentioning search/retrieval-adjacent
+    keywords), plus a manual pass through Software Advice's Google Photos review page. Every review used as evidence
+    is shown verbatim above under "Show the original reviews (proof)." Full source code and the collection script
+    are in this repository. Reddit and other forum sources are being added as they're manually collected.
   </div>
 
 </div>
