@@ -376,28 +376,116 @@ document
 
 function renderLive(result, raw) {
   const resultsEl = document.getElementById('liveResults');
-  if (!result || !Array.isArray(result.themes)) { resultsEl.innerHTML = '<div class="hint">No structured result came back.</div>'; return; }
+
+  if (!result || !Array.isArray(result.themes)) {
+    resultsEl.innerHTML =
+      '<div class="hint">No structured result came back.</div>';
+    return;
+  }
+
   const wrap = document.createElement('div');
+
   result.themes.forEach(theme => {
-    const stageKey = STAGE_LABELS[theme.stage] ? theme.stage : 'other';
+    const stageKey = STAGE_LABELS[theme.stage]
+      ? theme.stage
+      : 'other';
+
     const el = document.createElement('div');
     el.className = 'theme';
     el.style.borderLeftColor = STAGE_COLOR[stageKey];
-    const evCount = Array.isArray(theme.evidence) ? theme.evidence.length : 0;
+
+    const evidence = Array.isArray(theme.evidence)
+      ? theme.evidence
+      : [];
+
     let evHtml = '';
-    (theme.evidence || []).forEach(ev => {
-      const orig = (typeof ev.source_index === 'number' && raw[ev.source_index]) ? raw[ev.source_index] : '';
-      evHtml += '<li>' + escapeHtml(ev.summary || '') + (orig ? ' <span class="hint">(' + escapeHtml(orig.slice(0, 90)) + (orig.length > 90 ? '…' : '') + ')</span>' : '') + '</li>';
+
+    evidence.forEach((ev, index) => {
+      const original =
+        typeof ev.source_index === 'number' &&
+        raw[ev.source_index]
+          ? raw[ev.source_index]
+          : '';
+
+      const summary = ev.summary || '';
+
+      evHtml += `
+        <li style="margin-bottom:14px;">
+          <div style="margin-bottom:6px;">
+            <strong>Why it was grouped here:</strong>
+            ${escapeHtml(summary)}
+          </div>
+
+          ${
+            original
+              ? `
+                <details>
+                  <summary
+                    class="hint"
+                    style="cursor:pointer; font-weight:600;"
+                  >
+                    Show original user review
+                  </summary>
+
+                  <div
+                    style="
+                      margin-top:8px;
+                      padding:12px;
+                      background:rgba(0,0,0,0.035);
+                      border-radius:8px;
+                      line-height:1.5;
+                    "
+                  >
+                    ${escapeHtml(original)}
+                  </div>
+                </details>
+              `
+              : `
+                <div class="hint">
+                  Original review could not be matched to this evidence item.
+                </div>
+              `
+          }
+        </li>
+      `;
     });
+
     el.innerHTML =
-      '<span class="badge">' + escapeHtml(STAGE_LABELS[stageKey]) + '</span>' +
-      '<h3>' + escapeHtml(theme.name || 'Untitled') + '</h3>' +
-      '<div class="count">' + evCount + ' comment(s)</div>' +
-      '<p class="sub" style="font-size:0.88rem; margin:6px 0;">' + escapeHtml(theme.description || '') + '</p>' +
-      '<ul class="evidence">' + evHtml + '</ul>';
+      '<span class="badge">' +
+      escapeHtml(STAGE_LABELS[stageKey]) +
+      '</span>' +
+
+      '<h3>' +
+      escapeHtml(theme.name || 'Untitled') +
+      '</h3>' +
+
+      '<div class="count">' +
+      evidence.length +
+      ' comment(s)' +
+      '</div>' +
+
+      '<p class="sub" style="font-size:0.88rem; margin:6px 0 12px;">' +
+      escapeHtml(theme.description || '') +
+      '</p>' +
+
+      '<details open>' +
+      '<summary class="hint" style="cursor:pointer; font-weight:600;">' +
+      'View evidence (' +
+      evidence.length +
+      ')' +
+      '</summary>' +
+
+      '<ul class="evidence" style="margin-top:10px;">' +
+      evHtml +
+      '</ul>' +
+
+      '</details>';
+
     wrap.appendChild(el);
   });
+
   resultsEl.appendChild(wrap);
+}
 }
 </script>
 </body>
