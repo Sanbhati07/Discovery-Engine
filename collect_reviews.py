@@ -92,7 +92,7 @@ def collect_app_store(app_name="google-photos", app_id=962194608, target=100):
 
 if __name__ == "__main__":
     all_lines = []
-    all_lines += collect_play_store(target=250)
+    all_lines += collect_play_store(target=700)
     all_lines += collect_app_store(target=100)
 
     out_path = "google_photos_reviews_filtered.txt"
