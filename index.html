@@ -209,6 +209,10 @@
     </p>
     <label for="input">Reviews / comments to analyze (one per line)</label>
     <textarea id="input" placeholder="Paste real user comments here, one per line..."></textarea>
+    <div style="margin-top:10px;">
+  <button id="loadDatasetBtn" type="button">Load 700 collected reviews</button>
+  <span class="status" id="datasetStatus"></span>
+</div>
     <div class="hint">Example: "I remember the café was in Goa but I can't find the photo — search only shows random results."</div>
     <div style="margin-top:14px;">
       <button id="runBtn">Analyze now</button>
@@ -334,6 +338,41 @@ function runClassifier() {
 }
 
 document.getElementById('runBtn').addEventListener('click', runClassifier);
+  async function loadCollectedReviews() {
+  const input = document.getElementById('input');
+  const status = document.getElementById('datasetStatus');
+  const button = document.getElementById('loadDatasetBtn');
+
+  button.disabled = true;
+  status.textContent = 'Loading collected reviews...';
+
+  try {
+    const response = await fetch('google_photos_reviews_filtered.txt');
+
+    if (!response.ok) {
+      throw new Error('Could not load review dataset.');
+    }
+
+    const text = await response.text();
+    const lines = text
+      .split('\n')
+      .map(line => line.trim())
+      .filter(Boolean);
+
+    input.value = lines.join('\n');
+
+    status.textContent = `Loaded ${lines.length} collected reviews.`;
+  } catch (error) {
+    console.error(error);
+    status.textContent = 'Could not load the review dataset.';
+  } finally {
+    button.disabled = false;
+  }
+}
+
+document
+  .getElementById('loadDatasetBtn')
+  .addEventListener('click', loadCollectedReviews);
 
 function renderLive(result, raw) {
   const resultsEl = document.getElementById('liveResults');
