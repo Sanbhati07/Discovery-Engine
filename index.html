@@ -52,49 +52,81 @@
     it analyze them live.
   </p>
 
-  <div class="card" style="border-left: 5px solid var(--stage5); border-top:none; border-right:none; border-bottom:none; border-radius:10px;">
+  <div class="card" style="border-left: 5px solid var(--stage4); border-top:none; border-right:none; border-bottom:none; border-radius:10px;">
     <span class="badge">Key finding</span>
     <p class="sub" style="font-size:0.92rem; margin:4px 0 0;">
-      Google already ships a conversational "describe what you remember" search feature (Ask Photos, 2024). The
-      real, evidence-backed gap isn't the absence of natural-language search — it's that real users don't trust
-      it yet and are reverting to old keyword-search habits. That reframes the opportunity from "build vague
-      search" to "make AI-assisted retrieval something people actually rely on."
+      Google Photos already supports conversational photo search, so the opportunity is not simply to make search
+      understand natural language. The review evidence points to what happens when the first search is weak: meaningful
+      clues can still produce incomplete or noisy results, and users are often left without a clear next step to recover.
+      This reframes the opportunity from "better first search" to "better recovery after a failed search."
     </p>
   </div>
 
   <div class="card">
-    <h2>Data quality — an honest note</h2>
+    <h2>Research scope and data quality</h2>
     <div class="stat-row">
-      <div class="stat"><div class="num" id="baseCount">250</div><div class="label">reviews collected (baseline)</div></div>
-      <div class="stat"><div class="num">23</div><div class="label">genuinely about retrieval (~9%)</div></div>
-      <div class="stat"><div class="num" id="liveCount">0</div><div class="label">analyzed live from this browser</div></div>
+      <div class="stat"><div class="num">700</div><div class="label">Play Store reviews collected</div></div>
+      <div class="stat"><div class="num">27</div><div class="label">retrieval cases manually verified</div></div>
+      <div class="stat"><div class="num">3</div><div class="label">recurring retrieval failures</div></div>
     </div>
     <p class="sub" style="font-size:0.85rem;">
-      The keyword filter used to collect these reviews was intentionally broad, which pulled in a lot of unrelated
-      reviews (app crashes, subscription complaints, layout changes). Only the 23 below, verified individually
-      against their exact original text (shown under each theme), are genuinely about failing to find a remembered
-      photo.
+      The collection filter was intentionally broad to reduce the risk of missing retrieval complaints. That also
+      captured unrelated reviews, so the evidence set was manually verified against the original review text. The
+      27 cases below are a manually verified subset, not a prevalence estimate for all Google Photos users.
     </p>
   </div>
 
   <div class="card">
-    <h2>What the 23 relevant reviews show</h2>
+    <h2>Three recurring retrieval failures emerged from the evidence</h2>
+
+    <div class="theme" style="border-left-color: var(--stage2);">
+      <span class="badge">01 · Clue quality in retrieval</span>
+      <h3>The clue is not used well</h3>
+      <p class="sub" style="font-size:0.88rem; margin:0;">
+        Users report giving meaningful clues — such as an address, object, face or specific words — but still getting
+        blank or incomplete results.
+      </p>
+    </div>
+
+    <div class="theme" style="border-left-color: var(--stage3);">
+      <span class="badge">02 · Result evaluation</span>
+      <h3>Too many photos look possible</h3>
+      <p class="sub" style="font-size:0.88rem; margin:0;">
+        When retrieval is noisy or incomplete, users still have to inspect many candidates to decide what might be
+        the photo they remember.
+      </p>
+    </div>
+
+    <div class="theme" style="border-left-color: var(--stage4);">
+      <span class="badge">03 · Recovery after failure</span>
+      <h3>There is no clear recovery step</h3>
+      <p class="sub" style="font-size:0.88rem; margin:0;">
+        After a weak first search, users retry, browse or give up. The system does not make the next useful step
+        obvious.
+      </p>
+    </div>
+
+    <p class="hint" style="margin:4px 0 0;">Evidence is directional, not a prevalence claim: the 27 cases are a manually verified subset of the collected reviews.</p>
+  </div>
+
+  <div class="card">
+    <h2>What the 27 relevant cases show across the retrieval journey</h2>
 
     <div class="theme" style="border-left-color: var(--stage-other);">
-      <span class="badge">Stage 1 · Expressing</span>
+      <span class="badge">Stage 1 · Putting the memory into words</span>
       <h3>No examples found in this dataset</h3>
-      <div class="count">0 of 23</div>
+      <div class="count">0 of 27</div>
       <p class="sub" style="font-size:0.85rem; margin:0;">
-        A real finding, not an oversight: app reviews are written after someone has already tried and failed to
-        search, so they don't capture the earlier moment of struggling to put a fuzzy memory into words. That
-        moment can only really be captured through direct user interviews.
+        No evidence in this review corpus: app reviews are usually written after someone has already tried and failed to
+        search, so they do not capture the earlier moment of struggling to put a fuzzy memory into words. That stage
+        needs direct user research to validate.
       </p>
     </div>
 
     <div class="theme" style="border-left-color: var(--stage2);">
-      <span class="badge">Stage 2 · Understanding</span>
+      <span class="badge">Stage 2 · Search does not use the clue well</span>
       <h3>Search fails to use the clue the person actually gave it</h3>
-      <div class="count">7 of 23</div>
+      <div class="count">11 of 27</div>
       <ul class="evidence">
         <li>Searched a work address to find related photos; got no results at all.</li>
         <li>Searched "car engine" among 100+ repair photos; only 15 came up, AI often replied "none."</li>
@@ -105,23 +137,27 @@
         <li>Terminology confusion (starred vs. favorites vs. collections) means a starred photo can't be found again.</li>
       </ul>
       <details>
-        <summary class="hint" style="cursor:pointer;">Show the 7 original reviews (proof)</summary>
+        <summary class="hint" style="cursor:pointer;">Show the 11 original reviews (proof)</summary>
         <ul class="evidence" style="margin-top:8px;">
-          <li>"search doesn't I have a lot of remodeling jobs by address in ALBUMS, I put an address in the search field and nothing useless." — 2026-09-24, 1★</li>
-          <li>"...TEXT/SUBJECT search is FAIL. 'Car Engine' - have 100s of repair photos But Only 15 Show? Often AI says 'none'..." — 2026-09-22, 1★</li>
-          <li>"I can't label my face or search for it" — 2026-09-15, 1★</li>
-          <li>"Face grouping which should be the apps greatest strength & feature is an absolute waste of time. It hardly finds anyone you love or care about..." — 2026-09-24, 3★</li>
-          <li>"The photos app is this the best. But the recent update has removed the face groups. I can search them by name but i can not see the face groups in search button of new layout..." — 2026-09-23, 5★</li>
-          <li>"sharing photos to Gemini or Signal or other app doesn't work - literally nothing happens. Search is useless..." — 2026-09-18, 1★</li>
-          <li>"Whoever designed this was linguistically challenged... You star a photo and can't find it elsewhere." — 2026-09-20, 1★</li>
+          <li>"search doesn't I have a lot of remodeling jobs by address in ALBUMS, I put an address in the search field and nothing useless." — Play Store, 2026-09-24, 1★</li>
+          <li>"...TEXT/SUBJECT search is FAIL. 'Car Engine' - have 100s of repair photos But Only 15 Show? Often AI says 'none'..." — Play Store, 2026-09-22, 1★</li>
+          <li>"I can't label my face or search for it" — Play Store, 2026-09-15, 1★</li>
+          <li>"Face grouping which should be the apps greatest strength & feature is an absolute waste of time. It hardly finds anyone you love or care about..." — Play Store, 2026-09-24, 3★</li>
+          <li>"The photos app is this the best. But the recent update has removed the face groups. I can search them by name but i can not see the face groups in search button of new layout..." — Play Store, 2026-09-23, 5★</li>
+          <li>"sharing photos to Gemini or Signal or other app doesn't work - literally nothing happens. Search is useless..." — Play Store, 2026-09-18, 1★</li>
+          <li>"Whoever designed this was linguistically challenged... You star a photo and can't find it elsewhere." — Play Store, 2026-09-20, 1★</li>
+          <li>"When I do a search in the new Google Photos ap, I can only see places and things and not people." — Tom's Guide forum</li>
+          <li>"...it does not pick up all the faces in a general search... I have quite a few photos that it skipped." — Tom's Guide forum</li>
+          <li>"...when i was in the process of uploading all my pictures it showed alot of my family. Now it just has 5 pictures and when i click more at the bottom nothing happens." — Tom's Guide forum</li>
+          <li>"users who have been invited to join a shared album cannot easily search for individuals or pets in those albums through the Photos app's central search option." — reported by Android Authority</li>
         </ul>
       </details>
     </div>
 
     <div class="theme" style="border-left-color: var(--stage3);">
-      <span class="badge">Stage 3 · Judging</span>
+      <span class="badge">Stage 3 · Hard to judge the results</span>
       <h3>Results don't carry the context needed to tell photos apart</h3>
-      <div class="count">3 of 23</div>
+      <div class="count">3 of 27</div>
       <ul class="evidence">
         <li>Wants photos grouped by date/event rather than topic, to distinguish similar occasions.</li>
         <li>Lost the ability to select all photos from one specific date or month in a single tap.</li>
@@ -138,9 +174,9 @@
     </div>
 
     <div class="theme" style="border-left-color: var(--stage4);">
-      <span class="badge">Stage 4 · Recovering</span>
+      <span class="badge">Stage 4 · Hard to recover after a failed search</span>
       <h3>No good way to narrow down or regain a working search</h3>
-      <div class="count">5 of 23</div>
+      <div class="count">5 of 27</div>
       <ul class="evidence">
         <li>Wants a way to hide unrelated local photos so only backed-up ones show while searching.</li>
         <li>New finding: search now requires turning on cloud Backup first — locked behind an unrelated setting.</li>
@@ -160,9 +196,9 @@
     </div>
 
     <div class="theme" style="border-left-color: var(--stage5);">
-      <span class="badge">Stage 5 · Trusting — the largest, most consistent pattern</span>
-      <h3>People believe the AI search is worse on purpose, and stop relying on it</h3>
-      <div class="count">8 of 23</div>
+      <span class="badge">Adjacent signal · Trust concerns around AI search</span>
+      <h3>Some users distrust AI-assisted search after poor retrieval</h3>
+      <div class="count">8 of 27</div>
       <ul class="evidence">
         <li>Believes classic keyword search was deliberately weakened to push people toward the AI assistant.</li>
         <li>Calls the AI photo assistant "useless" and "worthless" for search.</li>
@@ -170,7 +206,7 @@
         <li>Multiple long-time users say search quality has declined since AI features were added.</li>
       </ul>
       <details>
-        <summary class="hint" style="cursor:pointer;">Show the 8 original reviews (proof)</summary>
+        <summary class="hint" style="cursor:pointer;">Show the 8 original reviews (supporting evidence)</summary>
         <ul class="evidence" style="margin-top:8px;">
           <li>"I love how they clearly made the search feature worse so you're forced to be more likely to use their stupid AI." — 2026-09-24, 1★</li>
           <li>"the Gemini bot is absolutely useless just a completely worthless terrible thing" — 2026-09-24, 1★</li>
@@ -183,6 +219,8 @@
         </ul>
       </details>
     </div>
+
+    <p class="hint" style="margin:0 0 14px;">The AI-trust pattern is treated as a supporting signal, not the primary retrieval problem. It matters because repeated poor results can reduce willingness to try the AI path again.</p>
 
     <div class="theme" style="border-left-color: var(--stage-other);">
       <span class="badge">Positive counter-evidence</span>
@@ -201,11 +239,10 @@
     <h2>Try it yourself — live analysis, right here, no login</h2>
     <p class="sub" style="font-size:0.88rem;">
       Paste your own real reviews/comments below and click Analyze — this runs instantly in your browser using a
-      transparent, rule-based classifier, so it always works: no API key, no login, no external service, no cost,
-      ever. <em>(The 250-review findings above were analyzed using Claude AI directly; this live demo uses a fast
-      local pattern-matcher instead of a live LLM call, specifically so it never depends on any account, key, or
-      provider's uptime — full methodology and the AI-based analysis process are in the
-      <a href="https://github.com/Sanbhati07/Discovery-Engine" target="_blank">GitHub repo</a>.)</em>
+      transparent, deterministic rule-based classifier. It needs no API key, login, external service or cost. The
+      research synthesis above was conducted separately from this live demo; this page intentionally does not call
+      a live LLM, so the interactive analyzer stays reliable and inspectable. Full source code and methodology are in the
+      <a href="https://github.com/Sanbhati07/Discovery-Engine" target="_blank">GitHub repo</a>.
     </p>
     <label for="input">Reviews / comments to analyze (one per line)</label>
     <textarea id="input" placeholder="Paste real user comments here, one per line..."></textarea>
@@ -224,19 +261,20 @@
 
   <div class="card">
     <h2>What do "Stage 1–5" mean?</h2>
-    <div class="legend-item"><strong>Stage 1 · Expressing —</strong> the person can't put a fuzzy memory into words specific enough to search with.<div class="q">From: "Is the user unable to express what they remember?"</div></div>
-    <div class="legend-item"><strong>Stage 2 · Understanding —</strong> a real clue was given, but the search failed to read or use it correctly.<div class="q">From: "Does Google Photos fail to understand the clues they provide?"</div></div>
-    <div class="legend-item"><strong>Stage 3 · Judging —</strong> results came back, but the person can't tell which one is right.<div class="q">From: "Are potentially relevant results difficult to evaluate?"</div></div>
-    <div class="legend-item"><strong>Stage 4 · Recovering —</strong> the first search failed, with no easy way to refine or retry.<div class="q">From: "Does the user struggle to refine an unsuccessful search?"</div></div>
-    <div class="legend-item"><strong>Stage 5 · Trusting —</strong> an AI search feature exists, but people distrust it and revert to old habits.<div class="q">Added from evidence — not one of the original questions, but the strongest pattern found.</div></div>
+    <div class="legend-item"><strong>Stage 1 · Putting the memory into words —</strong> the person struggles to turn a fuzzy memory into a useful search clue.<div class="q">This stage was not visible in the review corpus and needs direct user research.</div></div>
+    <div class="legend-item"><strong>Stage 2 · Search does not use the clue well —</strong> a meaningful clue was given, but the search failed to use it correctly.<div class="q">Examples include place, face, object and text retrieval failures.</div></div>
+    <div class="legend-item"><strong>Stage 3 · Hard to judge the results —</strong> results came back, but the person lacks enough context to tell which photo is right.<div class="q">Examples include date/event context and ambiguous result sets.</div></div>
+    <div class="legend-item"><strong>Stage 4 · Hard to recover after a failed search —</strong> the first attempt was weak, but the next useful refinement is unclear or cumbersome.<div class="q">This is the primary opportunity highlighted by the case study.</div></div>
+    <div class="legend-item"><strong>Stage 5 · Trust concerns around AI search —</strong> some users distrust AI-assisted search after poor retrieval experiences.<div class="q">Supporting signal, not treated as the primary problem definition.</div></div>
   </div>
 
   <div class="footer-note">
-    Source data: 250 Play Store reviews for Google Photos (collected via a script using the
-    <code>google-play-scraper</code> library, filtered to English-language reviews mentioning search/retrieval-adjacent
-    keywords), plus a manual pass through Software Advice's Google Photos review page. Every review used as evidence
-    is shown verbatim above under "Show the original reviews (proof)." Full source code and the collection script
-    are in this repository. Reddit and other forum sources are being added as they're manually collected.
+    <strong>Methodology.</strong> Source data includes 700 English-language Google Photos Play Store reviews collected via
+    <code>google-play-scraper</code> and filtered with retrieval-adjacent keywords, plus supporting public evidence from
+    Software Advice, Tom's Guide and Android Authority. The collection filter was intentionally broad; 27 cases were
+    then manually verified as directly relevant to photo retrieval. Every case used as evidence is shown under
+    "Show the original reviews (proof)" or as supporting public evidence. The live analyzer is a deterministic browser
+    pattern matcher, separate from the research synthesis. Full source code and the collection script are in this repository.
   </div>
 
 </div>
@@ -244,11 +282,11 @@
 <script>
 const STAGE_LABELS = {
   expressing: "Stage 1 · Putting the memory into words",
-  understanding: "Stage 2 · Search understanding the clue",
-  judging: "Stage 3 · Judging the results shown",
-  recovering: "Stage 4 · Recovering from a failed search",
-  trusting: "Stage 5 · Trusting / bothering to use the AI search",
-  other: "Not directly relevant"
+  understanding: "Stage 2 · Search does not use the clue well",
+  judging: "Stage 3 · Hard to judge the results",
+  recovering: "Stage 4 · Hard to recover after a failed search",
+  trusting: "Stage 5 · Trust concerns around AI search",
+  other: "Not relevant to photo retrieval"
 };
 const STAGE_COLOR = {
   expressing: "var(--accent)", understanding: "var(--stage2)", judging: "var(--stage3)",
@@ -257,33 +295,6 @@ const STAGE_COLOR = {
 
 function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-}
-
-// Running count of reviews analyzed live from this browser, persisted so it feels real across visits.
-function getLiveCount() { return parseInt(localStorage.getItem('discoveryEngineLiveCount') || '0', 10); }
-function setLiveCount(n) { localStorage.setItem('discoveryEngineLiveCount', String(n)); document.getElementById('liveCount').textContent = n; }
-setLiveCount(getLiveCount());
-
-function buildPrompt(lines) {
-  return [
-    "You are helping analyze real user complaints about failing to find an old photo they remember in Google Photos.",
-    "",
-    "Classify each comment into one of these stages:",
-    "1. expressing — struggles to put a fuzzy memory into words at all",
-    "2. understanding — gave a real clue (place, time, object, word) but the search failed to use it correctly",
-    "3. judging — got results back but can't tell which one (if any) is right, often missing context like dates",
-    "4. recovering — first search failed, no good way to refine or narrow it, forced to start over or scroll manually",
-    "5. trusting — an AI/conversational search feature exists but the person avoids, distrusts, or reverts from it",
-    "6. other — unrelated to vague-memory photo retrieval",
-    "",
-    "Group similar comments into named themes. Return ONLY valid JSON, no markdown fences, no commentary, in this exact shape:",
-    '{"themes":[{"name":"short theme name","stage":"expressing|understanding|judging|recovering|trusting|other","description":"1-2 plain sentences","evidence":[{"summary":"short paraphrase under 20 words","source_index":0}]}]}',
-    "",
-    "Every comment must appear in exactly one theme's evidence using its 0-based index. Do not invent comments.",
-    "",
-    "Comments:",
-    lines.map((l, i) => i + ". " + l).join("\n")
-  ].join("\n");
 }
 
 const RULES = {
@@ -326,14 +337,13 @@ function runClassifier() {
   });
 
   const themes = Object.keys(byStage).map(stage => ({
-    name: STAGE_LABELS[stage] || 'Not directly relevant',
+    name: STAGE_LABELS[stage] || 'Not relevant to photo retrieval',
     stage,
     description: '',
     evidence: byStage[stage].map(e => ({ summary: e.line.slice(0, 100), source_index: e.i }))
   }));
 
   statusEl.textContent = 'Done — classified ' + lines.length + ' comment(s) into ' + themes.length + ' group(s).';
-  setLiveCount(getLiveCount() + lines.length);
   renderLive({ themes }, lines);
 }
 
