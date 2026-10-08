@@ -71,8 +71,9 @@
     </div>
     <p class="sub" style="font-size:0.85rem;">
       The collection filter was intentionally broad to reduce the risk of missing retrieval complaints. That also
-      captured unrelated reviews, so the evidence set was manually verified against the original review text. The
-      27 cases below are a manually verified subset, not a prevalence estimate for all Google Photos users.
+      captured unrelated reviews, so the evidence set was manually verified against the source text. The 27 cases
+      below are a manually verified evidence set combining corpus reviews with a small number of supporting public
+      sources; they are directional, not a prevalence estimate for all Google Photos users.
     </p>
   </div>
 
@@ -106,7 +107,7 @@
       </p>
     </div>
 
-    <p class="hint" style="margin:4px 0 0;">Evidence is directional, not a prevalence claim: the 27 cases are a manually verified subset of the collected reviews.</p>
+    <p class="hint" style="margin:4px 0 0;">Evidence is directional, not a prevalence claim: the 27 cases are a manually verified evidence set drawn from the corpus and supporting public sources.</p>
   </div>
 
   <div class="card">
@@ -137,7 +138,8 @@
         <li>Terminology confusion (starred vs. favorites vs. collections) means a starred photo can't be found again.</li>
       </ul>
       <details>
-        <summary class="hint" style="cursor:pointer;">Show the 11 original reviews (proof)</summary>
+        <summary class="hint" style="cursor:pointer;">Show the 11 supporting evidence items</summary>
+        <div class="hint" style="margin:8px 0 0;">7 original Play Store reviews + 4 supporting public-source items.</div>
         <ul class="evidence" style="margin-top:8px;">
           <li>"search doesn't I have a lot of remodeling jobs by address in ALBUMS, I put an address in the search field and nothing useless." — Play Store, 2026-09-24, 1★</li>
           <li>"...TEXT/SUBJECT search is FAIL. 'Car Engine' - have 100s of repair photos But Only 15 Show? Often AI says 'none'..." — Play Store, 2026-09-22, 1★</li>
@@ -164,7 +166,8 @@
         <li>Says date-based search works, but is imprecise ("so-so") compared to face or map search.</li>
       </ul>
       <details>
-        <summary class="hint" style="cursor:pointer;">Show the 3 original reviews (proof)</summary>
+        <summary class="hint" style="cursor:pointer;">Show the 3 supporting evidence items</summary>
+        <div class="hint" style="margin:8px 0 0;">2 original Play Store reviews + 1 Software Advice item.</div>
         <ul class="evidence" style="margin-top:8px;">
           <li>"I prefer my photos to be available by date" — Play Store, 2026-09-24, 1★</li>
           <li>"Events and occasions are how I want photos arranged in Cloud! Dates are critical. Sorting photos by topic is not the way..." — Play Store, 2026-09-21, 2★</li>
@@ -229,7 +232,7 @@
       <p class="sub" style="font-size:0.85rem; margin:0;">
         From Software Advice: a user describes typing "Terry baseball game" or "Willow Bluey birthday cake" into
         search and finding the exact remembered photo in under 30 seconds. This is the working version of the
-        exact behavior our 23 failure cases show breaking down — useful proof that the opportunity is real and
+        exact behavior our 27 failure cases show breaking down — useful proof that the opportunity is real and
         achievable, not hypothetical.
       </p>
     </div>
@@ -478,7 +481,7 @@ function renderLive(result, raw) {
       escapeHtml(theme.description || '') +
       '</p>' +
 
-      '<details open>' +
+      '<details>' +
       '<summary class="hint" style="cursor:pointer; font-weight:600;">' +
       'View evidence (' +
       evidence.length +
